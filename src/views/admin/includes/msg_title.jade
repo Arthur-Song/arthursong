@@ -1,0 +1,8 @@
+//- Created by Arthur on 2017/1/20.
+mixin msgTitle(message)
+    -if (message.blog)
+        span.task-title-sp #{message.title}
+        a(href='/view/blog/#{message.blog._id}') #{message.blog.title}
+    -else if(message.project)
+        span.task-title-sp #{message.content}
+        a(href='/view/project/#{message.project._id}') #{message.project.title}

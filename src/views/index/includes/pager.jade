@@ -1,0 +1,26 @@
+//- Created by Arthur on 2017/1/18.
+mixin pager(hoster,page,type)
+    if page.currentPage === 0 && page.currentPage === page.totalPage-1
+        ul.pager
+            li.previous.disabled
+                a(href='#') &lt; 上一篇
+            li.next.disabled
+                a(href='#') 下一篇 &gt;
+    else if page.currentPage === 0 && page.currentPage < page.totalPage-1
+        ul.pager
+            li.previous.disabled
+                a(href='#') &lt; 上一篇
+            li.next
+                a(href='/#{hoster.username}/#{type}/list?p=#{page.currentPage+1}') 下一篇 &gt;
+    else if page.currentPage > 0 && page.currentPage === page.totalPage-1
+        ul.pager
+            li.previous
+                a(href='/#{hoster.username}/#{type}/list?p=#{page.currentPage-1}') &lt; 上一篇
+            li.next.disabled
+                a(href='#') 下一篇 &gt;
+    else if page.currentPage > 0 && page.currentPage < page.totalPage-1
+        ul.pager
+            li.previous
+                a(href='/#{hoster.username}/#{type}/list?p=#{page.currentPage-1}') &lt; 上一篇
+            li.next
+                a(href='/#{hoster.username}/#{type}/list?p=#{page.currentPage+1}') 下一篇 &gt;

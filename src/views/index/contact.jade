@@ -1,0 +1,64 @@
+//- Created by Arthur on 2017/1/5.
+extends ../layout
+
+block content
+    body.page-contact
+        #container.container
+            include includes/_header
+            .row.bottom
+                .col-lg-8.col-md-8.col-sm-7.col-left
+                    section
+                        .row
+                            .col-lg-8.col-lg-offset-2.col-md-8.col-md-offset-2
+                                h1 联系我
+                                h1.spacer ___
+                                p &nbsp;&nbsp;如果你对这个网站有什么建议，或是对我本人有什么建议，可以通过下方给我发送邮件,并留下您的联系方式（邮箱，qq或是其它..），谢谢您宝贵的意见！
+                                hr
+                                .panel.panel-default.contact.btn-footer
+                                    -if (error)
+                                        .alert.alert-danger
+                                            a.close &times;
+                                            strong #{error}
+                                    -if (success)
+                                        .alert.alert-success
+                                            a.close &times;
+                                            strong #{success}
+                                    form(role='form',action='#{hoster && "/"+hoster.username || ""}/contact',method='post')
+                                        .panel-body
+                                            .form-group
+                                                label(for='contactEmail') 邮箱：
+                                                input#contactEmail.form-control(type='email',name='mail[from]')
+                                            .form-group
+                                                label(for='contactMessage') 内容：
+                                                textarea#contactMessage.form-control(rows='10',name='mail[content]')
+                                        .panel-footer
+                                            button(type='submit').btn.btn-grey.btn-lg.btn-block 发送
+                .col-lg-4.col-md-4.col-sm-5.col-right
+                    #scroll-shadow
+                    section
+                        .row
+                            .col-lg-12
+                                .panel.panel-default.item
+                                    .panel-heading
+                                        a(href='#')
+                                            img.img-responsive.item-img(src='/public/img/contact/contact.jpg', alt='Avatar')
+                                    .panel-body
+                                        a(href='#')
+                                            h4.item-title #{site.author}
+                                        p.item-category 软件开发工程师  上海，浦东新区
+                                        p.item-description
+                                            | &nbsp;&nbsp;“好记性不如烂笔头”原本做这个博客的初衷是记录自己平时遇到的bug及解决方案，以及自己的项目心得，
+                                            | 以便日后遇到同样或是类似的坑，可以迅速跳出坑...
+                                        p.item-description &nbsp;&nbsp;后来朋友对我说：“为何不让大家都能分享，帮助更多人呢？”
+                                        p.item-description &nbsp;&nbsp;于是，便有了现在的这个博客系统。
+                                        hr
+                                        // social networks
+                                        .item-social.text-center
+                                            a(href='https://github.com/arthur-song')
+                                                img.social(src='/public/img/icon/github.png', alt='Github')
+                                            a(href='#')
+                                                img.social(src='/public/img/icon/gmail.png', alt='Google plus')
+                                            a(href='#')
+                                                img.social.bis(src='/public/img/icon/facebook.png', alt='Facebook')
+                                            a(href='#')
+                                                img.social.bis(src='/public/img/icon/qq.png', alt='QQ')

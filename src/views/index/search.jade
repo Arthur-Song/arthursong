@@ -1,0 +1,109 @@
+doctype html
+html.no-js(lang='en')
+    head
+        meta(charset='utf-8')
+        title= title
+        meta(name='author',content='#{site.author}')
+        meta(name='keywords',content='arthursong,arthur song,arthur,blog')
+        meta(name='description',content='#{site.description}')
+        meta(http-equiv='X-UA-Compatible',content='IE=edge')
+        meta(name='viewport', content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no')
+        link(rel='icon', type='image/png', href='#{site.icon}')
+        link(rel='stylesheet', type='text/css', href='/public/css/font-awesome.min.css')
+        link(rel='stylesheet', type='text/css', href='/public/css/normalize.css')
+        link(rel='stylesheet', type='text/css', href='/public/css/search.css')
+        link(rel='stylesheet', type='text/css', href='/public/css/component.css')
+        <!--[if IE 9]>
+        script(src='http://html5shiv.googlecode.com/svn/trunk/html5.js')
+        <!--[endif]-->
+    body
+        .container
+            .logo-wrapper.clearfix
+                h2(style='text-align: center;')
+                    a(href='/') Arthur Song
+            aside.sidebar.clearfix
+                nav
+                    a(href='/#{configs.owner}', title='主页')
+                        i.fa.fa-fw.fa-home
+                    a(href='/#{configs.owner}/project/list', title='项目')
+                        i.fa.fa-fw.fa-product-hunt
+                    a(href='/#{configs.owner}/blog/list', title='博客')
+                        i.fa.fa-fw.fa-book
+                    a(href='/#{configs.owner}/contact', title='联系我')
+                        i.fa.fa-fw.fa-phone
+            #morphsearch.morphsearch
+                form.morphsearch-form
+                    input#keyword.morphsearch-input(type='search', placeholder='搜索...')
+                    button.morphsearch-submit(type='submit') Search
+                - var arr = [0,1,2,3,4,5];
+                .morphsearch-content
+                    .dummy-column
+                        h2 用户(user)
+                        each item in arr
+                            a.dummy-media-object(href='http://twitter.com/SaraSoueidan')
+                                img(src='/public/img/logoa.png', alt='Arthur')
+                                h3 Arthur
+                    .dummy-column
+                        h2 项目(project)
+                        each item in arr
+                            a.dummy-media-object(href='http://twitter.com/SaraSoueidan')
+                                img(src='/public/img/logoa.png', alt='Arthur')
+                                h3 Arthur
+                    .dummy-column
+                        h2 博客(blog)
+                        each item in arr
+                            a.dummy-media-object(href='http://twitter.com/SaraSoueidan')
+                                img(src='/public/img/logoa.png', alt='Arthur')
+                                h3 Arthur
+                span.morphsearch-close
+            .overlay
+        script(type='text/javascript', src='/public/js/classie.js')
+        script(type='text/javascript').
+            (function() {
+                var morphSearch = document.getElementById( 'morphsearch' ),
+                    input = morphSearch.querySelector( 'input.morphsearch-input' ),
+                    ctrlClose = morphSearch.querySelector( 'span.morphsearch-close' ),
+                    isOpen = isAnimating = false,
+                    // show/hide search area
+                    toggleSearch = function(evt) {
+                        // return if open and the input gets focused
+                        if( evt.type.toLowerCase() === 'focus' && isOpen ) return false;
+                        var offsets = morphsearch.getBoundingClientRect();
+                        if( isOpen ) {
+                            classie.remove( morphSearch, 'open' );
+                            // trick to hide input text once the search overlay closes
+                            // todo: hardcoded times, should be done after transition ends
+                            if( input.value !== '' ) {
+                                setTimeout(function() {
+                                    classie.add( morphSearch, 'hideInput' );
+                                    setTimeout(function() {
+                                        classie.remove( morphSearch, 'hideInput' );
+                                        input.value = '';
+                                    }, 300 );
+                                }, 500);
+                            }
+                            input.blur();
+                        }
+                        else {
+                            classie.add( morphSearch, 'open' );
+                        }
+                        isOpen = !isOpen;
+                    };
+                // events
+                input.addEventListener( 'focus', toggleSearch );
+                ctrlClose.addEventListener( 'click', toggleSearch );
+                // esc key closes search overlay
+                // keyboard navigation events
+                document.addEventListener( 'keydown', function( ev ) {
+                    var keyCode = ev.keyCode || ev.which;
+                    if( keyCode === 27 && isOpen ) {
+                        toggleSearch(ev);
+                    }
+                } );
+                /***** for demo purposes only: don't allow to submit the form *****/
+                morphSearch.querySelector( 'button[type="submit"]' ).addEventListener( 'click', function(ev) {
+                    var keyword = document.getElementById('keyword').value;
+                    alert(keyword);
+                    ev.preventDefault();
+                } );
+            })();

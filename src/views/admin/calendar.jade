@@ -1,0 +1,147 @@
+//- Created by Arthur on 2017/1/12.
+extends ./layout
+
+block content
+    link(rel='stylesheet', href='/public/css/fullcalendar.min.css')
+    link(rel='stylesheet', href='/public/css/fullcalendar.print.css', media='print')
+    //-!{ Loader('/public/dist/css/calendar.min.css').css('/public/css/fullcalendar.min.css').css('/public/css/fullcalendar.print.css').done(assets,configs.site_static_host,configs.mini_assets) }
+    body(data-type='widgets')
+        .am-g.tpl-g
+            // 头部
+            include ./includes/header
+            // 风格切换
+            include ./includes/theme
+            // 侧边导航栏
+            include ./includes/menu
+            // 内容区域
+            .tpl-content-wrapper
+                .row-content.am-cf
+                    .tpl-calendar-box
+                        #calendar
+        // 弹出层
+        #calendar-edit-box.am-modal.am-modal-no-btn
+            .am-modal-dialog.tpl-model-dialog
+                .am-modal-hd
+                    a.am-close.edit-box-close.am-close-spin(href='javascript: void(0)', data-am-modal-close='') &times;
+                .am-modal-bd.tpl-am-model-bd.am-cf
+                    form(action='/admin/calendar/edit',method='post').am-form.tpl-form-border-form
+                        .am-form-group.am-u-sm-12
+                        label.am-u-sm-12.am-form-label.am-text-left 标题
+                            span.tpl-form-line-small-title Title
+                        .am-u-sm-12
+                            input#editTitle.tpl-form-input.am-margin-top-xs.calendar-edit-box-title(type='text', name='event[title]' placeholder='请填写事件...')
+                            input#editId(type='hidden', name='event[id]')
+                            input#editStart(type='hidden', name='event[start]')
+                            input#editEnd(type='hidden', name='event[end]')
+                        label.am-u-sm-12.am-form-label.am-text-left 级别
+                            span.tpl-form-line-small-title Level
+                        .am-u-sm-12
+                            label.am-form-label 普通&nbsp;&nbsp;
+                            input.tpl-form-input(name='level', type='radio',value=0)
+                            span &nbsp;&nbsp;
+                            label.am-form-label 紧急&nbsp;&nbsp;
+                            input.tpl-form-input(name='level', type='radio',value=1)
+                            span &nbsp;&nbsp;
+                            label.am-form-label 重要&nbsp;&nbsp;
+                            input.tpl-form-input(name='level', type='radio',value=2)
+                            span &nbsp;&nbsp;
+                            label.am-form-label 紧急&重要&nbsp;&nbsp;
+                            input.tpl-form-input(name='level', type='radio',value=3)
+                        .am-u-sm-12
+                            button.am-btn.am-btn-primary(style='margin:5px') 修改
+                            a#deleteA.am-btn.am-btn-danger(style='margin:5px') 删除
+                            button.am-btn.am-btn-warning(style='margin:5px',data-am-modal-close) 取消
+        script(src='/public/js/moment.js')
+        script(src='/public/js/fullcalendar.min.js')
+        script.
+            $(document).ready(function () {
+                var editBox = $('#calendar-edit-box');
+                var addBox = $('#calendar-add-box');
+                //事件
+                var events = !{ JSON.stringify(events) };
+                //当前用户id
+                var uid = '#{user._id}';
+
+                $('.edit-box-close').on('click', function () {
+                    $('#calendar').fullCalendar('unselect');
+                })
+                $('#calendar').fullCalendar({
+                    header: {
+                        left: 'prev,next today',
+                        center: 'title',
+                        right: 'month,agendaWeek,agendaDay'
+                    },
+                    monthNames: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+                    monthNamesShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+                    dayNames: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+                    dayNamesShort: ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"],
+                    today: ["今天"],
+                    firstDay: 1,
+                    buttonText: {
+                        today: 'Now',
+                        month: '月',
+                        week: '周',
+                        day: '日',
+                        prev: 'Prev',
+                        next: 'Next'
+                    },
+                    defaultDate: new moment(Date.now()).format('YYYY-MM-DD'),
+                    lang: 'zh-cn',
+                    navLinks: true, // can click day/week names to navigate views
+                    selectable: true,
+                    selectHelper: true,
+                    select: function (start, end) {
+                        var title = prompt('填写你的记录的:');
+                        var eventData;
+                        if (title) {
+                            eventData = {
+                                title: title,
+                                start: start,
+                                end: end
+                            };
+                            jQuery.ajax({
+                                method: 'POST',
+                                url: '/admin/calendar/add',
+                                data: {
+                                    uid: uid,
+                                    event: {
+                                        title: title,
+                                        start: start.toDate(),
+                                        end: end.toDate(),
+                                        level: 0
+                                    }
+                                },
+                                dataType: 'json',
+                                success: function (result) {
+                                    if (result.status === 1) {
+                                        eventData.id = result.event._id;
+                                        eventData.level = result.event.level;
+                                        console.log(JSON.stringify(result));
+                                        $('#calendar').fullCalendar('renderEvent', eventData, true); // stick? = true
+                                    } else {
+                                        alert('添加失败！');
+                                    }
+                                }
+                            });
+                        }
+                        $('#calendar').fullCalendar('unselect');
+                    },
+                    editable: true,
+                    eventLimit: true, // allow "more" link when too many events
+                    eventClick: function (event, jsEvent, view) {
+                        // event.source.events[0].title = '222223333'
+                        // 修改数据
+                        // 标题
+                        console.log(event);
+                        $('input[name=level]')[event.level].checked=true;
+                        $('#editId').val(event.id);
+                        $('#editTitle').val(event.title);
+                        $('#editStart').val(event.start.toDate().toString());
+                        $('#editEnd').val(event.end.toDate().toString());
+                        $('#deleteA').attr('href','/admin/calendar/delete/'+event.id);
+                        //  弹出框
+                        editBox.modal();
+                    },
+                    events: events || []
+                });
+            });

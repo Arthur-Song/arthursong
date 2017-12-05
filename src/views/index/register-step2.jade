@@ -1,0 +1,68 @@
+//- Created by arthursong on 17/1/8.
+extends ../layout
+
+block content
+    link(rel='stylesheet',href='/public/css/register.css')
+    body.page-contact
+        .row.top
+            .col-lg-12.col-md-12.col-sm-12.col-left.black
+                .name
+                    a(href='/').left #{site.name}
+                .status.right
+                    a(href='/login') 登录
+                    a(href='#') 注册
+        .row.bottom
+            .col-lg-12.col-md-12.col-sm-12
+                .w960.mt20
+                    #processor
+                        ol.processorBox.oh
+                            li
+                                .step_inner.fl
+                                    span.icon_step 1
+                                    h4 填写基本信息
+                            li.current
+                                .step_inner
+                                    span.icon_step 2
+                                    h4 邮箱激活
+                            li
+                                .step_inner.fr
+                                    span.icon_step 3
+                                    h4 完善资料
+                        .step_line
+                    .content
+                        -if (error)
+                            .alert.alert-danger
+                                a.close(data-dismiss='.alert') &times;
+                                strong #{error}
+                        -if (success)
+                            .alert.alert-success
+                                a.close(data-dismiss='.alert') &times;
+                                strong #{success}
+                        #step2.step
+                            form(action='/register/2',method='post')
+                                -if (registerUser)
+                                    input(type='hidden',name='id',value='#{registerUser._id}')
+                                    - if (!registerUser.active)
+                                        .w330
+                                            strong.f16 感谢注册，确认邮件已发送至你的注册邮箱 :
+                                                br
+                                                span #{registerUser.email}
+                                            p.c7b 请进入邮箱查看邮件，并激活帐号。
+                                            p
+                                                a.btn.btn_primary.mt20(href='#{registerUser.loginMail}') 登录邮箱
+                                            p.c7b.mt20 没有收到邮件？
+                                            p 1. 请检查邮箱地址是否正确，你可以返回
+                                                a#prevStep.c46(href='/register/1?id=#{registerUser._id}') 重新填写
+                                            p 2. 检查你的邮件垃圾箱
+                                            p 3. 若仍未收到确认，请尝试
+                                                a#resendMail.c46(href='/resendActive/#{registerUser._id}') 重新发送
+                                    - else
+                                        .w330
+                                            strong.f16 感谢您的注册，您的帐号 : #{registerUser.username}
+                                                br
+                                                span 已成功激活！
+                                            p.c7b 接下来请完善您的个人信息。
+                                            a.btn.btn-primary(href='/register/3?id=#{registerUser._id}') 完善个人信息
+                                - else
+                                    .w330
+                                        strong.f16 #{error || '信息错误！'}

@@ -1,0 +1,103 @@
+// 侧边导航栏
+.left-sidebar
+    // 用户信息
+    .tpl-sidebar-user-panel
+      .tpl-user-panel-slide-toggleable
+        .tpl-user-panel-profile-picture
+          img(src='#{user.avatar}', alt='#{user.username}')
+        span.user-panel-logged-in-text
+          i.am-icon-circle-o.am-text-success.tpl-user-panel-status-icon
+          | &nbsp;#{user.username}
+        a.tpl-user-panel-action-link(href='/admin/user/edit/#{user._id}')
+          span.am-icon-pencil &nbsp;账号设置
+    // 菜单
+    ul.sidebar-nav
+      //管理员
+      -if (user.role >=50)
+        li.sidebar-nav-heading 系统管理
+          span.sidebar-nav-heading-info 管理
+        li.sidebar-nav-link
+          a(href='/admin')
+            i.am-icon-server.sidebar-nav-link-logo
+            | 控制台
+        li.sidebar-nav-link
+          a.sidebar-nav-sub-title(href='javascript:;')
+            i.am-icon-user.sidebar-nav-link-logo
+            | 用户管理
+            span.am-icon-chevron-down.am-fr.am-margin-right-sm.sidebar-nav-sub-ico.sidebar-nav-sub-ico-rotate
+          ul.sidebar-nav.sidebar-nav-sub
+            li.sidebar-nav-link
+              a(href='/admin/user/list')
+                span.am-icon-list.sidebar-nav-link-logo
+                | 用户列表
+        //超级管理员
+        -if (user.role >= 100)
+          li.sidebar-nav-link
+            a.sidebar-nav-sub-title(href='javascript:;')
+              i.am-icon-user-secret.sidebar-nav-link-logo
+              | 管理员管理
+              span.am-icon-chevron-down.am-fr.am-margin-right-sm.sidebar-nav-sub-ico.sidebar-nav-sub-ico-rotate
+            ul.sidebar-nav.sidebar-nav-sub
+              li.sidebar-nav-link
+                a(href='/admin/admin/list')
+                  span.am-icon-list.sidebar-nav-link-logo
+                  | 管理员列表
+              li.sidebar-nav-link
+                a(href='/admin/admin/add')
+                  span.am-icon-plus.sidebar-nav-link-logo
+                  | 新增管理员
+        li.sidebar-nav-link
+          a.sidebar-nav-sub-title(href='javascript:;')
+            i.am-icon-product-hunt.sidebar-nav-link-logo
+            | 项目管理
+            span.am-icon-chevron-down.am-fr.am-margin-right-sm.sidebar-nav-sub-ico.sidebar-nav-sub-ico-rotate
+          ul.sidebar-nav.sidebar-nav-sub
+            li.sidebar-nav-link
+              a(href='/admin/project/list')
+                span.am-icon-list.sidebar-nav-link-logo
+                | 项目列表
+            li.sidebar-nav-link
+              a(href='/admin/project/add')
+                span.am-icon-plus.sidebar-nav-link-logo
+                | 新增项目
+        li.sidebar-nav-link
+          a.sidebar-nav-sub-title(href='javascript:;')
+            i.am-icon-book.sidebar-nav-link-logo
+            | 博客管理
+            span.am-icon-chevron-down.am-fr.am-margin-right-sm.sidebar-nav-sub-ico.sidebar-nav-sub-ico-rotate
+          ul.sidebar-nav.sidebar-nav-sub
+            li.sidebar-nav-link
+              a(href='/admin/blog/list')
+                span.am-icon-list.sidebar-nav-link-logo
+                |  博客列表
+            li.sidebar-nav-link
+              a(href='/admin/blog/add')
+                span.am-icon-plus.sidebar-nav-link-logo
+                |  新增博客
+      li.sidebar-nav-heading 个人中心
+        span.sidebar-nav-heading-info  我的
+      li.sidebar-nav-link
+        a(href='/#{user.username}')
+          i.am-icon-home.sidebar-nav-link-logo
+          | 我的主页
+      li.sidebar-nav-link
+        a(href='/admin/user/edit/#{user._id}')
+          i.am-icon-key.sidebar-nav-link-logo
+          | 修改个人信息
+      li.sidebar-nav-link
+        a(href='/admin/project/mine/list')
+          i.am-icon-product-hunt.sidebar-nav-link-logo
+          | 我的项目
+      li.sidebar-nav-link
+        a(href='/admin/blog/mine/list')
+          i.am-icon-columns.sidebar-nav-link-logo
+          | 我的博客
+      li.sidebar-nav-link
+        a(href='/admin/message/mine/list')
+          i.am-icon-bell.sidebar-nav-link-logo
+          | 消息中心
+          span.am-badge.am-badge-secondary.sidebar-nav-link-logo-ico.am-round.am-fr.am-margin-right-sm #{unreads && unreads.length || 0}
+      li.sidebar-nav-link
+        a(href='/admin/calendar/#{user._id}')
+          i.am-icon-calendar.sidebar-nav-link-logo
+          | 日历

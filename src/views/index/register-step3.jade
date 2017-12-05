@@ -1,0 +1,179 @@
+//- Created by arthursong on 17/1/8.
+extends ../layout
+
+block content
+    link(rel='stylesheet',href='/public/css/register.css')
+    link(rel='stylesheet',href='/public/js/plugins/webuploader/webuploader.css')
+    body.page-contact
+        .row.top
+            .col-lg-12.col-md-12.col-sm-12.col-left.black
+                .name
+                    a(href='/').left #{site.name}
+                .status.right
+                    a(href='/login') 登录
+                    a(href='#') 注册
+        .row.bottom
+            .col-lg-12.col-md-12.col-sm-12
+                .w960.mt20
+                    #processor
+                        ol.processorBox.oh
+                            li
+                                .step_inner.fl
+                                    span.icon_step 1
+                                    h4 填写基本信息
+                            li
+                                .step_inner
+                                    span.icon_step 2
+                                    h4 邮箱激活
+                            li.current
+                                .step_inner.fr
+                                    span.icon_step 3
+                                    h4 完善资料
+                        .step_line
+                    .content
+                        -if (error)
+                            .alert.alert-danger
+                                a.close(data-dismiss='.alert') &times;
+                                strong #{error}
+                        #step3.step
+                            form#step3_frm(action='/register/3', method='post')
+                                -if ( id || registerUser)
+                                    input(type='hidden',name='id',value='#{id || registerUser._id }')
+                                .frm_control_group
+                                    label.frm_label 头像
+                                    .frm_controls
+                                        #thelist
+                                            img(src='#{registerUser && registerUser.avatar || "/public/upload/avatar/avatar.png"}', width='128', height='128', alt='头像', style='border-radius: 64px;display: block')
+                                        #picker 选择图片
+                                        input#avatar(type='hidden',name='avatar',value='#{registerUser && registerUser.avatar || ""}')
+                                .frm_control_group
+                                    label.frm_label 性别
+                                    .frm_controls
+                                        -if (registerUser && registerUser.gender && registerUser.gender === 0)
+                                            label
+                                                input(type='radio', name='gender', value=1)
+                                                |  男 &nbsp;
+                                            label
+                                                input(type='radio', name='gender',checked , value=0)
+                                                |  女
+                                        -else
+                                            label
+                                                input(type='radio', name='gender',checked , value=1)
+                                                |  男 &nbsp;
+                                            label
+                                                input(type='radio', name='gender',value=0)
+                                                |  女
+                                .frm_control_group
+                                    label.frm_label 个人简介
+                                    .frm_controls
+                                        textarea.frm_textarea(name='remark', rows='5') #{registerUser && registerUser.remark || ""}
+                                .toolBar
+                                    button(type='submit')#finishedBtn.btn.btn_primary 完成
+        script(src='/public/js/plugins/webuploader/webuploader.withoutimage.js')
+        script.
+            (function (WebUploader) {
+
+                var that = this;
+
+                this.uploader = WebUploader.create({
+                    swf: '/public/js/plugins/webuploader/Uploader.swf',
+                    server: '/upload/upload',
+                    pick: $('#picker'),
+                    auto: true,
+                    fileSingleSizeLimit: 2 * 1024 * 1024
+                });
+
+                // 当有文件被添加进队列的时候
+                this.uploader.on('fileQueued', function (file) {
+                    var $container = $("#thelist").html('');
+                    var $item = $('<div id="' + file.id + '" class="item">' +
+                                    '<img width="128" height="128" style="border-radius: 64px;display: block">' +
+                                    '<p class="state">等待上传...</p>' +
+                                    '</div>'),
+                            $img = $item.find('img');
+                    $container.html($item);
+                });
+
+
+                // 文件上传过程中创建进度条实时显示。
+                this.uploader.on('uploadProgress', function (file, percentage) {
+                    var $li = $('#' + file.id),
+                            $percent = $li.find('.progress .progress-bar');
+                    // 避免重复创建
+                    if (!$percent.length) {
+                        var progress = '<div class="progress progress-striped active">' +
+                                '<div class="progress progress-bar" role="progressbar" style="width: 0%">' +
+                                '</div>' +
+                                '</div>';
+
+                        $percent = $(progress).prependTo($li).find('.progress-bar');
+                    }
+                    $li.find('p.state').text('上传中');
+                    $percent.css('width', percentage * 100 + '%');
+                });
+
+
+                this.uploader.on('uploadSuccess', function (file, res) {
+                    if (res.success) {
+                        $('#' + file.id).find('p.state').text('');
+                        $('#' + file.id).find('img').attr('src', res.url);
+                        $('#avatar').val(res.url);
+                    }
+                    else {
+                        $('#' + file.id).find('p.state').text('上传错误!');
+                    }
+                });
+
+                this.uploader.on('uploadError', function (file) {
+                    $('#' + file.id).find('p.state').text('上传错误!');
+                });
+
+                this.uploader.on('uploadComplete', function (file) {
+                    $('#' + file.id).find('.progress').fadeOut();
+                });
+
+                this.uploader.on('error', function (type) {
+                    self.removeFile();
+                    switch (type) {
+                        case 'Q_EXCEED_SIZE_LIMIT':
+                        case 'F_EXCEED_SIZE':
+                            alert('文件太大了, 不能超过2M');
+                            break;
+                        case 'Q_TYPE_DENIED':
+                            alert('只能上传图片');
+                            break;
+                        default:
+                            alert('发生未知错误');
+                    }
+                });
+
+            })(window.WebUploader);
+            //提示
+            function showTips(txt, time, status) {
+                var htmlCon = '';
+                if (txt != '') {
+                    if (status != 0 && status != undefined) {
+                        htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#4AAF33;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/ok.png" style="vertical-align: middle;margin-right:5px;" alt="OK，"/>' + txt + '</div>';
+                    } else {
+                        htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#D84C31;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/err.png" style="vertical-align: middle;margin-right:5px;" alt="Error，"/>' + txt + '</div>';
+                    }
+                    $('body').prepend(htmlCon);
+                    if (time == '' || time == undefined) {
+                        time = 1500;
+                    }
+                    setTimeout(function () {
+                        $('.tipsBox').remove();
+                    }, time);
+                }
+            }
+            $(function(){
+                $('#step3_frm').submit(function(){
+                    var avatar = $('#avatar').val();
+                    if(avatar === ''){
+                        showTips('请选择一张图片作为您的头像~');
+                        return false;
+                    }else{
+                        return true;
+                    }
+                })
+            });

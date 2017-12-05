@@ -1,0 +1,8 @@
+//- Created by Arthur on 2017/1/24.
+.am-u-sm-12.am-u-md-12.am-u-lg-4.widget-margin-bottom-lg
+    .tpl-user-card.am-text-center.widget-body-lg
+        .tpl-user-card-title #{user.username}
+        .achievement-subheading #{user.email}
+        img.achievement-image(src='#{user.avatar}',width='128',height='128')
+        .achievement-description
+            | #{user.remark}

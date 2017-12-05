@@ -1,0 +1,132 @@
+//- Created by arthursong on 17/1/7.
+extends ../layout
+
+block content
+    body(data-type='widgets')
+        .am-g.tpl-g
+            // 头部
+            include ../includes/header
+            // 风格切换
+            include ../includes/theme
+            // 侧边导航栏
+            include ../includes/menu
+            //内容
+            .tpl-content-wrapper
+                .row-content.am-cf
+                    .row
+                        .am-u-sm-12.am-u-md-12.am-u-lg-12
+                            .widget.am-cf
+                                .widget-head.am-cf
+                                    .widget-title.am-cf #{title || '项目列表'}
+                                .widget-body.am-fr
+                                    .am-u-sm-12.am-u-md-6.am-u-lg-6
+                                        .am-form-group
+                                            .am-btn-toolbar
+                                                .am-btn-group.am-btn-group-xs
+                                                    a(href='/admin/project/add').am-btn.am-btn-default.am-btn-success
+                                                        span.am-icon-plus
+                                                        |  新增
+                                    form#search(action='#{mine ? "/admin/project/mine/list":"/admin/project/list"}',method='get')
+                                        .am-u-sm-12.am-u-md-6.am-u-lg-3
+                                            .am-form-group.tpl-table-list-select
+                                                select(name='query[tag]',data-am-selected="{btnSize: 'sm'}")
+                                                    option(value='all') 所有类别
+                                                    option(value='front') 前端
+                                                    option(value='design') 设计
+                                                    option(value='background') 后台
+                                                    option(value='mobile') 移动端
+                                        .am-u-sm-12.am-u-md-12.am-u-lg-3
+                                            .am-input-group.am-input-group-sm.tpl-form-border-form.cl-p
+                                                input.am-form-field(name='query[keyword]',type='text')
+                                                span.am-input-group-btn
+                                                    button.am-btn.am-btn-default.am-btn-success.tpl-table-list-field.am-icon-search(type='submit')
+                                    .am-u-sm-12
+                                        .tpl-table-images
+                                            each item in projects || []
+                                                .am-u-sm-12.am-u-md-6.am-u-lg-4
+                                                    .tpl-table-images-content
+                                                        .tpl-table-images-content-i-time 发布时间：#{moment(item.meta.createAt).format('YYYY-MM-DD')}
+                                                        .tpl-i-title
+                                                            | #{item.title}
+                                                        a.tpl-table-images-content-i(href='/#{item.author.username === configs.owner ? "":item.author.username+"/"}project/#{item._id}')
+                                                            .tpl-table-images-content-i-info
+                                                                span.ico
+                                                                    img(src='#{item.author.avatar}', alt='#{item.author.username}')
+                                                                    | #{item.author.username}
+                                                            span.tpl-table-images-content-i-shadow
+                                                            img(src='#{item.preview}', alt='#{item.title}')
+                                                        .tpl-table-images-content-block
+                                                            .tpl-i-font(title='#{item.summary}')
+                                                                | #{item.summary.length >50 ? item.summary.slice(0,50)+'...':item.summary}
+                                                            .tpl-i-more
+                                                                ul
+                                                                    li: span.am-icon-eye.am-text-primary  #{item.visit_count}
+                                                                    -if (item.github)
+                                                                        li
+                                                                            a(href='#{item.github}')
+                                                                                span.am-icon-github.font-green
+                                                                                | &nbsp;github
+                                                            .am-btn-toolbar
+                                                                .am-btn-group.am-btn-group-xs.tpl-edit-content-btn
+                                                                    a.am-btn.am-btn-default.am-btn-primary(href='/#{item.author.username === configs.owner ? "":item.author.username+"/"}project/#{item._id}',style='margin-right:3px')
+                                                                        span.am-icon-eye
+                                                                        | &nbsp;查看
+                                                                    -if (user.role >= 100 || user.username === item.author.username)
+                                                                        a.am-btn.am-btn-default.am-btn-secondary(href='/admin/project/edit/#{item._id}',style='margin-right:3px')
+                                                                            span.am-icon-edit
+                                                                            | &nbsp;编辑
+                                                                    -else
+                                                                        a.am-btn.am-btn-default.am-btn-secondary.am-disabled(href='#',style='margin-right:3px')
+                                                                            span.am-icon-edit
+                                                                            | &nbsp;编辑
+                                                                    -if (user.role >= 100 || user.username === item.author.username)
+                                                                        -if (item.is_public)
+                                                                            a.am-btn.am-btn-default.am-btn-warning(href='/admin/project/private/#{item._id}',style='margin-right:3px')
+                                                                                span.am-icon-archive
+                                                                                | &nbsp;私密
+                                                                        -else
+                                                                            a.am-btn.am-btn-default.am-btn-success(href='/admin/project/public/#{item._id}',style='margin-right:3px')
+                                                                                span.am-icon-eye
+                                                                                | &nbsp;公开
+                                                                    -else
+                                                                        -if (item.is_public)
+                                                                            a.am-btn.am-btn-default.am-btn-warning.am-disabled(href='#',style='margin-right:3px')
+                                                                                span.am-icon-archive
+                                                                                | &nbsp;私密
+                                                                        -else
+                                                                            a.am-btn.am-btn-default.am-btn-success.am-disabled(href='#',style='margin-right:3px')
+                                                                                span.am-icon-eye
+                                                                                | &nbsp;公开
+                                                                    -if ((user.role >= 50 || user.username === item.author.username) && !item.deleted)
+                                                                        a.am-btn.am-btn-default.am-btn-danger(href='/admin/project/delete/#{item._id}',style='margin-right:3px')
+                                                                            span.am-icon-trash-o
+                                                                            | &nbsp;删除
+                                                                    -else if (user.role >= 50  && item.deleted)
+                                                                        a.am-btn.am-btn-default.am-btn-primary(href='/admin/project/recover/#{item._id}',style='margin-right:3px')
+                                                                            span.am-icon-circle-o-notch
+                                                                            | &nbsp;恢复
+                                                                    -else
+                                                                        a.tpl-table-black-operation-del.am-disabled(href='#')
+                                                                            i.am-icon-trash
+                                                                            | &nbsp;删除
+                                    .am-u-lg-12.am-cf
+                                        .am-fr
+                                            ul.am-pagination.tpl-pagination
+            script.
+                $(document).ready(function () {
+                    $('.tpl-pagination').twbsPagination({
+                        totalPages: #{pageCount || 0},
+                        visiblePages: 5,
+                        activeClass: 'am-active',
+                        paginationClass: 'am-pagination',
+                        disabledClass: 'am-disabled',
+                        first: '首页',
+                        last: '末页',
+                        prev: '&laquo;',
+                        next: '&raquo;',
+                        href: '#{mine ? "/admin/project/mine/list?page={{number}}":"/admin/project/list?page={{number}}"}',
+                        onPageClick: function (e, page) {
+                            console.log(page);
+                        }
+                    });
+                });

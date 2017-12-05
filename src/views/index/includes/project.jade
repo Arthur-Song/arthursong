@@ -1,0 +1,18 @@
+//- Created by Arthur on 2017/1/18.
+
+mixin project(hoster,project,map)
+    div(class='col-lg-6 col-md-12 col-sm-12 col-xs-6 mix #{project.tags.join(" ")}')
+        .panel.panel-default.item
+            .panel-heading
+                a(href='#{hoster.username === configs.owner ? "":"/"+hoster.username}/project/#{project._id}')
+                    img.img-responsive.item-img(src='#{project.preview}', alt='#{project.title}')
+            .panel-body
+                a(href='#{hoster.username === configs.owner ? "":"/"+hoster.username}/project/#{project._id}')
+                    h4.item-title #{project.title}
+                p.item-category #{ hoster.username || ""}
+                p(title='#{project.summary}').item-description #{project.summary.length > 30 ? project.summary.slice(0,30)+"...":project.summary}
+                hr
+                p.item-tags
+                    each tag in project.tags || []
+                        a(href='#') #{map[tag]}
+                        |  ,

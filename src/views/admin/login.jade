@@ -1,0 +1,21 @@
+//- Created by Arthur on 2017/1/6.
+extends layout
+
+block content
+    body(data-type='login')
+        .am-g.tpl-g
+            // 风格切换
+            include includes/theme
+            .tpl-login
+                .tpl-login-content
+                    .tpl-login-logo
+                    form(action='/admin/login' ,method='post').am-form.tpl-form-line-form
+                        -if (typeof(error) !== 'undefined' && error)
+                            .am-alert.am-alert-danger
+                                strong #{error}
+                        .am-form-group
+                            input#user-name.tpl-form-input(type='text',name='user[username]', placeholder='请输入账号')
+                        .am-form-group
+                            input#user-pass.tpl-form-input(type='password',name='user[password]', placeholder='请输入密码')
+                        .am-form-group
+                            button.am-btn.am-btn-primary.am-btn-block.tpl-btn-bg-color-success.tpl-login-btn(type='submit') 登录

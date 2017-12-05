@@ -1,0 +1,35 @@
+//- Created by Arthur on 2017/1/5.
+.row.top
+    .col-lg-8.col-md-8.col-sm-7.col-left.black
+        .name
+            a(href='#{hoster && hoster.username === configs.owner ? "/":"/"+hoster.username}').left #{site.name}
+        .status.right
+            -if (!user)
+                a(href='/admin/login') 登录
+                - if(configs.allowRegister)
+                    a(href='/register') 注册
+            -else
+                a(href='/admin') 后台管理
+                a(href='/admin/logout') 登出
+    .col-lg-4.col-md-4.col-sm-5.col-right
+        nav
+            ul#menu.list-inline
+                -if(hoster)
+                    li(class='#{tab && tab === "project" ? "active":""}')
+                        a(href='#{hoster.username === configs.owner ? "":"/"+hoster.username}/project/list') 项目
+                    li(class='#{tab && tab === "blog" ? "active":""}')
+                        a(href='#{hoster.username === configs.owner ? "":"/"+hoster.username}/blog/list') 博客
+                    li(class='#{tab && tab === "contact" ? "active":""}')
+                        a(href='#{hoster.username === configs.owner ? "":"/"+hoster.username}/contact') 联系我
+                -else
+                    li(class='#{tab && tab === "project" ? "active":""}')
+                        a(href='/project/list') 项目
+                    li(class='#{tab && tab === "blog" ? "active":""}')
+                        a(href='/blog/list') 博客
+                    li(class='#{tab && tab === "contact" ? "active":""}')
+                        a(href='/contact') 联系我
+                li.last
+                    a(href='#')
+                        img.social(src='/public/img/icon/icon-github.png', alt='facebook')
+                    a(href='#')
+                        img.social(src='/public/img/icon/icon-gmail.png', alt='twitter')

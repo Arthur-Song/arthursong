@@ -1,0 +1,48 @@
+//- Created by Arthur on 2017/1/10.
+header
+    // logo
+    .am-fl.tpl-header-logo
+        a(href='/admin')
+            img(src='/public/img/logo.png', alt='logo')
+    // 右侧内容
+    .tpl-header-fluid
+        // 侧边切换
+        .am-fl.tpl-header-switch-button.am-icon-list
+            span
+        // 搜索
+        .am-fl.tpl-header-search
+            form.tpl-header-search-form(action='javascript:;')
+                button.tpl-header-search-btn.am-icon-search
+                input.tpl-header-search-box(type='text', placeholder='搜索内容...')
+        // 其它功能
+        .am-fr.tpl-header-navbar
+            ul
+                // 欢迎语
+                li.am-text-sm.tpl-header-navbar-welcome
+                    a(href='javascript:;')
+                        | 欢迎你，
+                        span &nbsp;#{user.username}
+                // 新提示
+                li.am-dropdown(data-am-dropdown='')
+                    a.am-dropdown-toggle(href='javascript:;', data-am-dropdown-toggle='')
+                        i.am-icon-bell
+                        span.am-badge.am-badge-warning.am-round.item-feed-badge #{unreads && unreads.length || 0}
+                    // 弹出列表
+                    ul.am-dropdown-content.tpl-dropdown-content
+                        each item in unreads || []
+                            li.tpl-dropdown-menu-notifications
+                                a.tpl-dropdown-menu-notifications-item.am-cf(href='javascript:;')
+                                    .tpl-dropdown-menu-notifications-title
+                                        i.am-icon-bell
+                                        span &nbsp;#{item.title}
+                                    .tpl-dropdown-menu-notifications-time
+                                        | 12分钟前
+                        li.tpl-dropdown-menu-notifications
+                            a(href='/admin/message/mine/list').tpl-dropdown-menu-notifications-item.am-cf
+                                i.am-icon-bell
+                                | 进入列表
+                // 退出
+                li.am-text-sm
+                    a(href='/admin/logout')
+                        span.am-icon-sign-out
+                        | 退出

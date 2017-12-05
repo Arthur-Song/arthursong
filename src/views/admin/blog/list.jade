@@ -1,0 +1,147 @@
+//- Created by Arthur on 2017/1/6.
+extends ../layout
+
+block content
+    body(data-type='widgets')
+        .am-g.tpl-g
+            // 头部
+            include ../includes/header
+            // 风格切换
+            include ../includes/theme
+            // 侧边导航栏
+            include ../includes/menu
+            // 内容区域
+            .tpl-content-wrapper
+                .row-content.am-cf
+                    .row
+                        .am-u-sm-12.am-u-md-12.am-u-lg-12
+                            .widget.am-cf
+                                .widget-head.am-cf
+                                    .widget-title.am-cf #{ title || '博客列表'}
+                                .widget-body.am-fr
+                                    .am-u-sm-12.am-u-md-6.am-u-lg-6
+                                        .am-form-group
+                                            .am-btn-toolbar
+                                                .am-btn-group.am-btn-group-xs
+                                                    a.am-btn.am-btn-default.am-btn-success(href='/admin/blog/add')
+                                                        span.am-icon-plus
+                                                        |  新增
+                                                    //-button.am-btn.am-btn-default.am-btn-secondary(type='button')
+                                                        span.am-icon-eye
+                                                        |  公开
+                                                    //-button.am-btn.am-btn-default.am-btn-warning(type='button')
+                                                        span.am-icon-eye-slash
+                                                        |  隐藏
+                                                    //-button.am-btn.am-btn-default.am-btn-danger(type='button')
+                                                        span.am-icon-trash-o
+                                                        |  删除
+                                    form#search(action='#{mine? "/admin/blog/mine/list":"/admin/blog/list"}',method='get')
+                                        .am-u-sm-12.am-u-md-6.am-u-lg-3
+                                            .am-form-group.tpl-table-list-select
+                                                select(name='query[type]',data-am-selected="{btnSize: 'sm'}")
+                                                    option(value='all') 所有类别
+                                                    option(value='public') 公开
+                                                    option(value='private') 隐藏
+                                                    option(value='deleted') 删除
+                                        .am-u-sm-12.am-u-md-12.am-u-lg-3
+                                            .am-input-group.am-input-group-sm.tpl-form-border-form.cl-p
+                                                input.am-form-field(name='query[keyword]',type='text')
+                                                span.am-input-group-btn
+                                                    button.am-btn.am-btn-default.am-btn-success.tpl-table-list-field.am-icon-search(type='submit')
+                                    .am-u-sm-12
+                                        table.am-table.am-table-compact.am-table-striped.tpl-table-black(width='100%')
+                                            thead
+                                                tr
+                                                    th 选择
+                                                    th 缩略图
+                                                    th 标题
+                                                    th 状态
+                                                    th 作者
+                                                    th 标签
+                                                    th 创建时间
+                                                    th 最近修改时间
+                                                    th 操作
+                                            tbody
+                                                each item in blogs || []
+                                                    tr.gradeX
+                                                        td
+                                                            input(type='checkbox')
+                                                        td
+                                                            a(href='/#{item.author.username === configs.owner ? "":item.author.username+"/"}blog/#{item._id}')
+                                                                img.tpl-table-line-img(src='#{item.preview}', alt='#{item.title}')
+                                                        td.am-text-middle
+                                                            a(href='/#{item.author.username === configs.owner ? "":item.author.username+"/"}blog/#{item._id}') #{item.title}
+                                                        td.am-text-middle
+                                                            - if (item.deleted)
+                                                                span.am-badge.am-badge-danger 删除
+                                                            - else if(item.is_public)
+                                                                span.am-badge.am-badge-success 公开
+                                                            - else
+                                                                span.am-badge.am-badge-warning 隐藏
+                                                        td.am-text-middle #{item.author && item.author.username || ''}
+                                                        td.am-text-middle
+                                                            each tag in item.tags
+                                                                span(style='margin-right:2px').am-badge.am-badge-primary #{tag}
+                                                        td.am-text-middle #{moment(item.meta.createAt).format('YYYY-MM-DD')}
+                                                        td.am-text-middle #{moment(item.meta.lastModified).format('YYYY-MM-DD')}
+                                                        td.am-text-middle
+                                                            .tpl-table-black-operation
+                                                                -if (user.role >= 100 || user.username === item.author.username)
+                                                                    a(href='/admin/blog/edit/#{item._id}',style='margin-right:3px')
+                                                                        i.am-icon-pencil
+                                                                        | &nbsp;编辑
+                                                                -else
+                                                                    a.disabled(href='#',style='margin-right:3px')
+                                                                        i.am-icon-pencil
+                                                                        | &nbsp;编辑
+                                                                -if (user.role >= 100 || user.username === item.author.username)
+                                                                    - if (item.is_public)
+                                                                        a.tpl-table-black-operation-private(href='/admin/blog/private/#{item._id}',style='margin-right:3px')
+                                                                            i.am-icon-eye-slash
+                                                                            | &nbsp;隐藏
+                                                                    - else
+                                                                        a.tpl-table-black-operation-public(href='/admin/blog/public/#{item._id}',style='margin-right:3px')
+                                                                            i.am-icon-eye
+                                                                            | &nbsp;公开
+                                                                -else
+                                                                    - if (item.is_public)
+                                                                        a.tpl-table-black-operation-private.disabled(href='#',style='margin-right:3px')
+                                                                            i.am-icon-eye-slash
+                                                                            | &nbsp;隐藏
+                                                                    - else
+                                                                        a.tpl-table-black-operation-public.disabled(href='#',style='margin-right:3px')
+                                                                            i.am-icon-eye
+                                                                            | &nbsp;公开
+                                                                -if ((user.role >= 50 || user.username === item.author.username) && !item.deleted)
+                                                                    a.tpl-table-black-operation-del(href='/admin/blog/delete/#{item._id}')
+                                                                        i.am-icon-trash
+                                                                        | &nbsp;删除
+                                                                -else if (user.role >= 50  && item.deleted)
+                                                                    a(href='/admin/blog/recover/#{item._id}')
+                                                                        i.am-icon-circle-o-notch
+                                                                        | &nbsp;恢复
+                                                                -else
+                                                                    a.tpl-table-black-operation-del.am-disabled(href='#')
+                                                                        i.am-icon-trash
+                                                                        | &nbsp;删除
+                                    .am-u-lg-12.am-cf
+                                        .am-fr
+                                            ul.am-pagination.tpl-pagination
+        script.
+            $(document).ready(function () {
+                $('.tpl-pagination').twbsPagination({
+                    totalPages: #{pageCount || 0},
+                    visiblePages: 5,
+                    activeClass: 'am-active',
+                    paginationClass: 'am-pagination',
+                    disabledClass: 'am-disabled',
+                    first: '首页',
+                    last: '末页',
+                    prev: '&laquo;',
+                    next: '&raquo;',
+                    href: '#{mine ? "/admin/blog/mine/list?page={{number}}":"/admin/blog/list?page={{number}}"}',
+                    onPageClick: function (e, page) {
+                        console.log(page);
+                    }
+                });
+            });

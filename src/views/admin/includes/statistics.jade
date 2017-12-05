@@ -1,0 +1,25 @@
+//- Created by Arthur on 2017/1/11.
+.am-u-sm-12.am-u-md-6.am-u-lg-4
+    .widget.widget-primary.am-cf
+        .widget-statistic-header
+            | 项目个数
+        .widget-statistic-body
+            .widget-statistic-value
+                | #{statistic.projectCount || 0} 个
+            span.widget-statistic-icon.am-icon-anchor
+.am-u-sm-12.am-u-md-6.am-u-lg-4
+    .widget.widget-orange.am-cf
+        .widget-statistic-header
+            | 博客篇数
+        .widget-statistic-body
+            .widget-statistic-value
+                | #{statistic.blogCount || 0} 篇
+            span.widget-statistic-icon.am-icon-credit-card-alt
+.am-u-sm-12.am-u-md-6.am-u-lg-4
+    .widget.widget-purple.am-cf
+        .widget-statistic-header
+            | 用户量
+        .widget-statistic-body
+            .widget-statistic-value
+                | #{statistic.userCount || 0} 位
+            span.widget-statistic-icon.am-icon-support

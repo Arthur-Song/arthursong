@@ -1,0 +1,29 @@
+//- Created by Arthur on 2017/1/5.
+extends ../layout
+
+block content
+    link(rel='stylesheet',href='/public/css/register.css')
+    body.page-contact
+        .row.top
+            .col-lg-12.col-md-12.col-sm-12.col-left.black
+                .name
+                    a(href='/').left #{site.name}
+                .status.right
+                    a(href='/login') 登录
+                    a(href='#') 注册
+        .row.bottom
+            .panel.panel-default
+                form(role='form',action='/reply/edit',method='post')
+                    .panel-body
+                        input(type='hidden',name='reply[id]',value='#{editreply._id}')
+                        input(type='hidden',name='blog_id',value='#{blog_id}')
+                        .form-group
+                            textarea#editor.editor.form-control(name='reply[content]' ,rows='3') #{editreply.content}
+                    .panel-footer
+                        button(type='submit').btn.btn-grey.btn-lg.btn-block 提交
+        include includes/editor
+        script.
+            (function(){
+                var editor = new Editor();
+                editor.render($('.editor')[0]);
+            })();

@@ -1,0 +1,66 @@
+//- Created by Arthur on 2017/1/11.
+.am-u-sm-12.am-u-md-12.am-u-lg-8.widget-margin-bottom-lg
+    .widget.am-cf.widget-body-lg
+        .widget-body.am-fr
+            .am-scrollable-horizontal
+                table#example-r.am-table.am-table-compact.am-text-nowrap.tpl-table-black(width='100%')
+                    thead
+                        tr
+                            th 文章标题
+                            th 作者
+                            th 标签
+                            th 发布时间
+                            th 最近一次操作时间
+                            th 操作
+                    tbody
+                        each item in blogs || []
+                            tr.gradeX
+                                td
+                                    a(href='/#{item.author.username === configs.owner ? "":item.author.username+"/"}blog/#{item._id}')
+                                        | #{item.title}
+                                td #{item.author.username}
+                                td
+                                    each tag in item.tags
+                                        span(style='margin-right:2px').am-badge.am-badge-success #{tag}
+                                td #{moment(item.meta.createAt).format('YYYY年MM月DD日')}
+                                td #{moment(item.meta.lastModified).format('YYYY年MM月DD日')}
+                                td
+                                    .tpl-table-black-operation
+                                        -if (user.role >= 100 || user.username === item.author.username)
+                                            a(href='/admin/blog/edit/#{item._id}',style='margin-right:3px')
+                                                i.am-icon-pencil
+                                                | &nbsp;编辑
+                                        -else
+                                            a.disabled(href='#',style='margin-right:3px')
+                                                i.am-icon-pencil
+                                                | &nbsp;编辑
+                                        -if (user.role >= 100 || user.username === item.author.username)
+                                            - if (item.is_public)
+                                                a.tpl-table-black-operation-private(href='/admin/blog/private/#{item._id}',style='margin-right:3px')
+                                                    i.am-icon-eye-slash
+                                                    | &nbsp;隐藏
+                                            - else
+                                                a.tpl-table-black-operation-public(href='/admin/blog/public/#{item._id}',style='margin-right:3px')
+                                                    i.am-icon-eye
+                                                    | &nbsp;公开
+                                        -else
+                                            - if (item.is_public)
+                                                a.tpl-table-black-operation-private.disabled(href='#',style='margin-right:3px')
+                                                    i.am-icon-eye-slash
+                                                    | &nbsp;隐藏
+                                            - else
+                                                a.tpl-table-black-operation-public.disabled(href='#',style='margin-right:3px')
+                                                    i.am-icon-eye
+                                                    | &nbsp;公开
+                                        -if ((user.role >= 50 || user.username === item.author.username) && !item.deleted)
+                                            a.tpl-table-black-operation-del(href='/admin/blog/delete/#{item._id}')
+                                                i.am-icon-trash
+                                                | &nbsp;删除
+                                        -else if (user.role >= 50  && item.deleted)
+                                            a(href='/admin/blog/recover/#{item._id}')
+                                                i.am-icon-circle-o-notch
+                                                | &nbsp;恢复
+                                        -else
+                                            a.tpl-table-black-operation-del.am-disabled(href='#')
+                                                i.am-icon-trash
+                                                | &nbsp;删除

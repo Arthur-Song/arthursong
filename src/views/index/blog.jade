@@ -1,0 +1,168 @@
+//- Created by Arthur on 2017/1/5.
+extends ../layout
+
+block content
+    body.page-blog
+        #container.container
+            include includes/_header
+            -if(blog)
+                .row.bottom
+                    .col-lg-8.col-md-8.col-sm-7.col-left
+                        div
+                            section
+                                // article image
+                                img.img-responsive(src='#{blog.preview}', alt='')
+                                // article title
+                                h1 #{blog.title || ""}
+                                h1.spacer ___
+                                // article date
+                                p.article-date #{moment(blog.meta.createAt).format('YYYY年MM月DD日')}
+                                // article tags
+                                p.article-tags
+                                    each tag in blog.tags || []
+                                        a(href='#') #{tag}
+                                        |  ,
+                                // article content
+                                p.article-description
+                                    strong
+                                        | #{blog.summary || ""}
+                                div#content
+                                    !{ blog.content || ""}
+                                // 分页
+                                include includes/pager
+                                +pager(hoster,page,'blog')
+                                hr
+                                // 评论
+                                h1 评论
+                                h1.spacer ___
+                                each item in replies || []
+                                    .media
+                                        a.pull-left(href='#')
+                                            img.media-object.img-circle(src='#{item.author.avatar}', alt='#{item.author.username}', width='48')
+                                        .pull-right
+                                            if(user)
+                                                if(item.ups.indexOf(user._id) >=0)
+                                                    a.comment-icon.thumb-up(href='javascript:;',title='喜欢',data-rid='#{item._id}',style='color:black')
+                                                        span.glyphicon.glyphicon-thumbs-up
+                                                        span.thumbs &nbsp;#{item.ups && item.ups.length || 0}
+                                                else
+                                                    a.comment-icon.thumb-up(href='javascript:;',title='喜欢',data-rid='#{item._id}')
+                                                        span.glyphicon.glyphicon-thumbs-up
+                                                        span.thumbs &nbsp;#{item.ups && item.ups.length || 0}
+                                                if(user._id === item.author._id || user.role >= 100)
+                                                    a.comment-icon(href='/reply/edit/#{item._id}',title='编辑')
+                                                        span.glyphicon.glyphicon-edit
+                                                if(user._id === item.author._id || user.role >= 50)
+                                                    a.comment-icon(href='/reply/remove/#{blog._id}/#{item._id}',title='删除')
+                                                        span.glyphicon.glyphicon-trash
+                                                a.comment-icon.reply(href='javascript:;',title='回复',data-author='#{user._id}',data-reply='#{item._id}',data-reply-master='#{item.author.username}',data-reply-uid='#{item.author._id}')
+                                                    span.glyphicon.glyphicon-pencil
+                                            else
+                                                a.comment-icon(href='#',title='喜欢')
+                                                    span.glyphicon.glyphicon-thumbs-up
+                                                span #{item.ups.length}
+                                        .media-body
+                                            h3.media-heading #{item.author.username}
+                                            p.comment-date #{moment(item.meta.createAt).format('YYYY-MM-DD')}
+                                            p.comment-content
+                                                | !{md.render(item.content)}
+                                        .replyBox
+                                hr.sm
+                                if(user)
+                                    h3 留言
+                                    form(role='form',action='/reply/add',method='post')
+                                        input(type='hidden',name='reply[blog]',value='#{blog._id}')
+                                        input(type='hidden',name='reply[author]',value='#{user._id}')
+                                        input(type='hidden',name='reply[hoster_name]',value='#{hoster.username}')
+                                        .form-group
+                                            textarea.editor.form-control(name='reply[content]' ,rows='3')
+                                        .form-group
+                                            button.btn.btn-primary(type='submit') 提交
+                                hr
+                                // 分享
+                                .row
+                                    .col-lg-4.col-md-4.col-sm-4.col-xs-4
+                                        h3.share 分享
+                                    .col-lg-8.col-md-8.col-sm-8.col-xs-8.text-right
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/wechat.png', alt='微信')
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/sina.png', alt='新浪')
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/facebook.png', alt='Facebook')
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/qq.png', alt='QQ')
+                    .col-lg-4.col-md-4.col-sm-5.col-right
+                        #scroll-shadow
+                        h1#posts-list.visible-xs.section-header 最新博客
+                        h1.visible-xs.text-center.spacer ___
+                        section.blog
+                            each item in blogs || []
+                                .media
+                                    a.pull-left(href='#{hoster.username === configs.owner ? "":"/"+hoster.username}/blog/#{item._id}')
+                                        img.media-object.img-responsive(width='120' src='#{item.preview}', alt='#{item.title}')
+                                    .media-body
+                                        h4.media-heading
+                                            | #{item.title}
+                                        p.article-category #{item.tags.join(',')}
+                                        p.article-date #{moment(item.meta.createAt).format('YYYY年MM月DD日')}
+                                        p.article-description(title='#{item.summary}')
+                                            | #{item.summary.length > 50 ? item.summary.slice(0,50)+'...':item.summary}
+                        //-a.btn.btn-default.btn-lg.btn-block.load-more 加载更多
+                        a.btn.btn-block.scroll-top.visible-xs
+                            img(src='/public/img/icon/icon-chevron.png', alt='回到顶部')
+            -else
+                .row.bottom
+                    .col-lg-8.col-md-8.col-sm-7.col-left
+                    .col-lg-4.col-md-4.col-sm-5.col-right
+        include includes/editor
+        script.
+            $(function(){
+                (function () {
+                    var editor = new Editor();
+                    var commentEditor = $('.editor')[0];
+                    if (commentEditor) {
+                        editor.render(commentEditor);
+                    }
+                })();
+                var blog_id = '#{blog._id}',
+                    hoster_name = '#{hoster.username}';
+                if(!blog_id){
+                    return;
+                }else {
+                    $('.reply').click(function () {
+                        var replyBox = $(this).parent().parent().find('.replyBox');
+                        var replyForm = $('<form action="/reply/add" method="post">' +
+                            '<input type="hidden" name="reply[blog]" value="' + blog_id + '">' +
+                            '<input type="hidden" name="reply[author]" value="' + $(this).attr('data-author') + '">' +
+                            '<input type="hidden" name="reply[reply_fa]" value="' + $(this).attr('data-reply') + '">' +
+                            '<input type="hidden" name="reply[hoster_name]" value="' + hoster_name + '">' +
+                            '<input type="hidden" name="reply[reply_master]" value="' + $(this).attr('data-reply-master') + '">' +
+                            '<input type="hidden" name="reply[reply_master_id]" value="' + $(this).attr('data-reply-uid') + '">' +
+                            '<div class="form-group">' +
+                            '<textarea required autofocus="autofocus" class="replyEditor form-control" name="reply[content]" rows="3"></textarea>' +
+                            '</div>' +
+                            '<div class="form-group">' +
+                            '<button class="btn btn-primary">提交</button>' +
+                            '</div>' +
+                            '</form>');
+                        var editor = new Editor();
+                        editor.render(replyForm.find('.replyEditor')[0]);
+                        replyBox.html(replyForm);
+                    })
+                    $('.thumb-up').click(function () {
+                        var that = this;
+                        var rid = $(this).attr('data-rid');
+                        $.get('/reply/up/' + rid, function (result) {
+                            if (result.status === 1) {
+                                if (result.add) {
+                                    $(that).css('color', 'black');
+                                } else {
+                                    $(that).css('color', 'gray');
+                                }
+                                $(that).find('.thumbs').html('&nbsp;' + result.reply.ups.length)
+                            }
+                        })
+                    })
+                }
+            });

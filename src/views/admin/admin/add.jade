@@ -1,0 +1,213 @@
+//- Created by Arthur on 2017/1/11.
+extends ../layout
+
+block content
+    body(data-type='widgets')
+        .am-g.tpl-g
+            // 头部
+            include ../includes/header
+            // 风格切换
+            include ../includes/theme
+            // 侧边导航栏
+            include ../includes/menu
+            //内容区域
+            .tpl-content-wrapper
+                .row-content.am-cf
+                    .row
+                        .am-u-sm-12.am-u-md-12.am-u-lg-12
+                            .widget.am-cf
+                                .widget-head.am-cf
+                                    .widget-title.am-fl #{title || '添加管理员'}
+                                    .widget-function.am-fr
+                                        a.am-icon-cog(href='javascript:;')
+                                .widget-body.am-fr
+                                    -if (typeof(error) !== 'undefined' && error)
+                                        .am-alert.am-alert-danger
+                                            strong #{error}
+                                    form#addAdmin(action='/admin/admin/add',method='post').am-form.tpl-form-line-form
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label(for='username') 用户名：
+                                            .am-u-sm-9
+                                                input#username.tpl-form-input(required='required', name='user[username]', type='text', placeholder='请输入用户名...')
+                                                small 用户名为必填字段，且长度在5-20位之间，且用户名必须由数字，字母，- 或 _ 组成。
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label 头像：
+                                            .am-u-sm-9
+                                                .am-form-group.am-form-file
+                                                    #thelist.tpl-form-file-img
+                                                        img(src='#{edituser && edituser.avatar || "/public/upload/avatar/avatar.png"}', alt='头像',width='90',height='90')
+                                                    #picker.am-btn.am-btn-danger.am-btn-xs
+                                                        i.am-icon-cloud-upload
+                                                        |  修改头像
+                                                    input#avatar(type='hidden',name='user[avatar]',value='#{edituser && edituser.avatar || ""}')
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label 性别：
+                                            .am-u-sm-9
+                                                - if( edituser && edituser.gender && edituser.gender == 0)
+                                                    label.am-form-label 男&nbsp;&nbsp;
+                                                    input.tpl-form-input(name='user[gender]', type='radio',value=1)
+                                                    span &nbsp;&nbsp;
+                                                    label.am-form-label 女&nbsp;&nbsp;
+                                                    input.tpl-form-input(name='user[gender]', type='radio',value=0,checked)
+                                                - else
+                                                    label.am-form-label 男&nbsp;&nbsp;
+                                                    input.tpl-form-input(name='user[gender]', type='radio', checked,value=1)
+                                                    span &nbsp;&nbsp;
+                                                    label.am-form-label 女&nbsp;&nbsp;
+                                                    input.tpl-form-input(name='user[gender]', type='radio',value=0)
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label(for='password') 密码：
+                                            .am-u-sm-9
+                                                input#password.tpl-form-input(required='', name='user[password]', type='password', placeholder='请输入密码...')
+                                                small 密码长度为8-16为，且，数字、字母、字符至少包含两种。
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label(for='confirmPassword') 确认密码：
+                                            .am-u-sm-9
+                                                input#confirmPassword.tpl-form-input(name='user[confirmPassword]', type='password', placeholder='请再次输入密码...')
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label(for='email') 邮箱：
+                                            .am-u-sm-9
+                                                input#email.tpl-form-input(required='required', name='user[email]',value='#{edituser && edituser.email || ""}' type='email', placeholder='请输入邮箱...')
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label(for='adminType') 管理员类型：
+                                            .am-u-sm-9
+                                                select#adminType(required='', name='adminType', data-am-selected='{searchBox: 1}', style='display: none;')
+                                                    option(value='0') 管理员
+                                                    option(value='1') 超级管理员
+                                        .am-form-group
+                                            label.am-u-sm-3.am-form-label(for='remark') 简介：
+                                            .am-u-sm-9
+                                                textarea#remark( name='user[remark]',rows='5', placeholder='我的简介', style='resize:none') #{edituser && edituser.remark || ""}
+                                        .am-form-group
+                                            .am-u-sm-9.am-u-sm-push-3
+                                                button.am-btn.am-btn-primary(type='submit') 添加
+                                                a.am-btn.am-btn-warning(href='/admin/admin/list',style='margin-left:5px') 取消
+            script(src='/public/js/plugins/webuploader/webuploader.withoutimage.js')
+            script.
+                (function (WebUploader) {
+                    var that = this;
+                    this.uploader = WebUploader.create({
+                        swf: '/public/js/plugins/webuploader/Uploader.swf',
+                        server: '/upload/upload',
+                        pick: $('#picker'),
+                        auto: true,
+                        fileSingleSizeLimit: 2 * 1024 * 1024
+                    });
+                    // 当有文件被添加进队列的时候
+                    this.uploader.on('fileQueued', function (file) {
+                        var $container = $("#thelist").html('');
+                        var $item = $('<div id="' + file.id + '" class="item">' +
+                                        '<img width="90" height="90" style="border-radius: 64px;display: block">' +
+                                        '<p class="state">等待上传...</p>' +
+                                        '</div>'),
+                                $img = $item.find('img');
+                        $container.html($item);
+                    });
+                    // 文件上传过程中创建进度条实时显示。
+                    this.uploader.on('uploadProgress', function (file, percentage) {
+                        var $li = $('#' + file.id),
+                                $percent = $li.find('.progress .progress-bar');
+                        // 避免重复创建
+                        if (!$percent.length) {
+                            var progress = '<div class="progress progress-striped active">' +
+                                    '<div class="progress progress-bar" role="progressbar" style="width: 0%">' +
+                                    '</div>' +
+                                    '</div>';
+
+                            $percent = $(progress).prependTo($li).find('.progress-bar');
+                        }
+                        $li.find('p.state').text('上传中');
+                        $percent.css('width', percentage * 100 + '%');
+                    });
+                    this.uploader.on('uploadSuccess', function (file, res) {
+                        if (res.success) {
+                            $('#' + file.id).find('p.state').text('');
+                            $('#' + file.id).find('img').attr('src', res.url);
+                            $('#avatar').val(res.url);
+                        }
+                        else {
+                            $('#' + file.id).find('p.state').text('上传错误!');
+                        }
+                    });
+                    this.uploader.on('uploadError', function (file) {
+                        $('#' + file.id).find('p.state').text('上传错误!');
+                    });
+                    this.uploader.on('uploadComplete', function (file) {
+                        $('#' + file.id).find('.progress').fadeOut();
+                    });
+                    this.uploader.on('error', function (type) {
+                        self.removeFile();
+                        switch (type) {
+                            case 'Q_EXCEED_SIZE_LIMIT':
+                            case 'F_EXCEED_SIZE':
+                                alert('文件太大了, 不能超过2M');
+                                break;
+                            case 'Q_TYPE_DENIED':
+                                alert('只能上传图片');
+                                break;
+                            default:
+                                alert('发生未知错误');
+                        }
+                    });
+                })(window.WebUploader);
+                //提示
+                function showTips(txt, time, status) {
+                    var htmlCon = '';
+                    if (txt != '') {
+                        if (status != 0 && status != undefined) {
+                            htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#4AAF33;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/ok.png" style="vertical-align: middle;margin-right:5px;" alt="OK，"/>' + txt + '</div>';
+                        } else {
+                            htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#D84C31;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/err.png" style="vertical-align: middle;margin-right:5px;" alt="Error，"/>' + txt + '</div>';
+                        }
+                        $('body').prepend(htmlCon);
+                        if (time == '' || time == undefined) {
+                            time = 1500;
+                        }
+                        setTimeout(function () {
+                            $('.tipsBox').remove();
+                        }, time);
+                    }
+                }
+                $(function () {
+                    $('#addAdmin').submit(function () {
+                        var username = $('#username').val();
+                        var avatar = $('#avatar').val();
+                        var password = $('#password').val();
+                        var confirmPassword = $('#confirmPassword').val();
+                        var email = $('#email').val();
+                        var usernameReg = /^[a-zA-Z0-9\-_]+$/i; //用户名正则
+                        var EmailReg = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/; //邮件正则
+                        var passwordReg = /^((?=.*\d)(?=.*\D)|(?=.*[a-zA-Z])(?=.*[^a-zA-Z]))^.{8,16}$/; //密码正则
+
+                        if (username == '') {
+                            showTips('请填写用户名~');
+                            return false;
+                        } else if (username.length < 6 || username.length > 20) {
+                            showTips('用户名长度必需在6-20位之间~');
+                            return false;
+                        } else if (!usernameReg.test(username)) {
+                            showTips('用户名格式错咯~');
+                            return false;
+                        } else if (email == '') {
+                            showTips('请填写邮箱~');
+                            return false;
+                        } else if (!EmailReg.test(email)) {
+                            showTips('邮箱格式错咯~');
+                            return false;
+                        } else if (password == '') {
+                            showTips('请填写密码~');
+                            return false;
+                        } else if (!passwordReg.test(password)) {
+                            showTips('密码格式错咯~');
+                            return false;
+                        } else if (confirmPassword == '') {
+                            showTips('请再次输入密码~');
+                            return false;
+                        } else if (password != confirmPassword || confirmPassword != password) {
+                            showTips('两次密码输入不一致呢~');
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    })
+                });

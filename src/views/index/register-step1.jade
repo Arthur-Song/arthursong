@@ -1,0 +1,144 @@
+//- Created by arthursong on 17/1/8.
+extends ../layout
+
+block content
+    link(rel='stylesheet',href='/public/css/register.css')
+    body.page-contact
+        .row.top
+            .col-lg-12.col-md-12.col-sm-12.col-left.black
+                .name
+                    a(href='/').left #{site.name}
+                .status.right
+                    a(href='/login') 登录
+                    a(href='#') 注册
+        .row.bottom
+            .col-lg-12.col-md-12.col-sm-12
+                .w960.mt20
+                    #processor
+                        ol.processorBox.oh
+                            li.current
+                                .step_inner.fl
+                                    span.icon_step 1
+                                    h4 填写基本信息
+                            li
+                                .step_inner
+                                    span.icon_step 2
+                                    h4 邮箱激活
+                            li
+                                .step_inner.fr
+                                    span.icon_step 3
+                                    h4 完善资料
+                        .step_line
+                    .content
+                        -if (error)
+                            .alert.alert-danger
+                                a.close(data-dismiss='.alert') &times;
+                                strong #{error}
+                        #step1.step
+                            - if (registerUser)
+                                form#step1_frm(action='/register/1', method='post')
+                                    input(type='hidden',name='id',value='#{registerUser._id}')
+                                    .frm_control_group
+                                        label.frm_label 用户名
+                                        .frm_controls
+                                            input.frm_input.username(type='text', name='username', maxlength='20',value='#{registerUser.username}')
+                                            p.frm_tips 作为登录帐号，请填写未被平台注册、且必须由数字，字母，- 或 _ 组成，长度在6-20位之间
+                                        label.frm_label 邮箱
+                                        .frm_controls
+                                            input.frm_input.email(type='text', name='email', maxlength='32',value='#{registerUser.email}')
+                                            p.frm_tips 作为登录邮箱，请填写未被平台注册、帐号绑定的邮箱
+                                    .frm_control_group
+                                        label.frm_label 密码
+                                        .frm_controls
+                                            input.frm_input.passwd(type='password', name='password')
+                                            p.frm_tips 密码长度为8-16位，且，数字、字母、字符至少包含两种，区分大小写
+                                    .frm_control_group
+                                        label.frm_label 确认密码
+                                        .frm_controls
+                                            input.frm_input.passwd2(type='password', name='confirmPassword')
+                                    .toolBar
+                                        button(type='submit')#nextBtn.btn.btn_primary 下一步
+                            - else
+                                form#step1_frm(action='/register/1', method='post')
+                                    .frm_control_group
+                                        label.frm_label 用户名
+                                        .frm_controls
+                                            input.frm_input.username(type='text', name='username', maxlength='20')
+                                            p.frm_tips 作为登录帐号，请填写未被平台注册、且必须由数字，字母，- 或 _ 组成，长度在6-20位之间
+                                        label.frm_label 邮箱
+                                        .frm_controls
+                                            input.frm_input.email(type='text', name='email', maxlength='32')
+                                            p.frm_tips 作为登录邮箱，请填写未被平台注册、帐号绑定的邮箱
+                                    .frm_control_group
+                                        label.frm_label 密码
+                                        .frm_controls
+                                            input.frm_input.passwd(type='password', name='password')
+                                            p.frm_tips 密码长度为8-16位，且，数字、字母、字符至少包含两种，区分大小写
+                                    .frm_control_group
+                                        label.frm_label 确认密码
+                                        .frm_controls
+                                            input.frm_input.passwd2(type='password', name='confirmPassword')
+                                    .toolBar
+                                        button(type='submit')#nextBtn.btn.btn_primary 下一步
+        script.
+            //显示提示框，目前三个参数(txt：要显示的文本；time：自动关闭的时间（不设置的话默认1500毫秒）；status：默认0为错误提示，1为正确提示；)
+            function showTips(txt, time, status) {
+                var htmlCon = '';
+                if (txt != '') {
+                    if (status != 0 && status != undefined) {
+                        htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#4AAF33;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/ok.png" style="vertical-align: middle;margin-right:5px;" alt="OK，"/>' + txt + '</div>';
+                    } else {
+                        htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#D84C31;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/err.png" style="vertical-align: middle;margin-right:5px;" alt="Error，"/>' + txt + '</div>';
+                    }
+                    $('body').prepend(htmlCon);
+                    if (time == '' || time == undefined) {
+                        time = 1500;
+                    }
+                    setTimeout(function () {
+                        $('.tipsBox').remove();
+                    }, time);
+                }
+            }
+            $(function () {
+                //AJAX提交以及验证表单
+                $('#step1_frm').submit(function(){
+                    var username = $('.username').val();
+                    var email = $('.email').val();
+                    var passwd = $('.passwd').val();
+                    var passwd2 = $('.passwd2').val();
+                    var usernameReg = /^[a-zA-Z0-9\-_]+$/i; //用户名正则
+                    var EmailReg = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/; //邮件正则
+                    var passwordReg = /^((?=.*\d)(?=.*\D)|(?=.*[a-zA-Z])(?=.*[^a-zA-Z]))^.{8,16}$/; //密码正则
+                    if (username == '') {
+                        showTips('请填写您的用户名~');
+                        return false;
+                    } else if (username.length < 6 || username.length > 20) {
+                        showTips('用户名长度必需在6-20位之间~');
+                        return false;
+                    } else if (!usernameReg.test(username)) {
+                        showTips('您的用户名格式错咯~');
+                        return false;
+                    } else if (email == '') {
+                        showTips('请填写您的邮箱~');
+                        return false;
+                    } else if (!EmailReg.test(email)) {
+                        showTips('您的邮箱格式错咯~');
+                        return false;
+                    } else if (passwd == '') {
+                        showTips('请填写您的密码~');
+                        return false;
+                    } else if (!passwordReg.test(passwd)) {
+                        showTips('您的密码格式错咯~');
+                        return false;
+                    } else if (passwd2 == '') {
+                        showTips('请再次输入您的密码~');
+                        return false;
+                    } else if (passwd != passwd2 || passwd2 != passwd) {
+                        showTips('两次密码输入不一致呢~');
+                        return false;
+                    } else {
+                        return true;
+                    }
+                });
+
+            });

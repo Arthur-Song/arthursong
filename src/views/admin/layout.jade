@@ -1,0 +1,31 @@
+//- Created by Arthur on 2017/1/10.
+doctype html
+html(lang='zh-cn')
+    head
+        meta(charset='utf-8')
+        meta(http-equiv='X-UA-Compatible', content='IE=edge')
+        title #{title}
+        meta(name='description', content='#{site.description}')
+        meta(name='keywords', content='index')
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        meta(name='renderer', content='webkit')
+        meta(http-equiv='Cache-Control', content='no-siteapp')
+        link(rel='icon', type='image/png', href='#{site.icon}')
+        link(rel='apple-touch-icon-precomposed', href='#{site.icon}')
+        meta(name='apple-mobile-web-app-title', content='Arthur Song')
+        //-!{Loader('/public/dist/css/app.admin.min.css').css('/public/css/amazeui.min.css').css('/public/css/amazeui.datatables.min.css').css('/public/js/plugins/editor/editor.css').css('/public/css/app.css').done(assets,configs.site_static_host,configs.mini_assets)}
+        //-link(rel='stylesheet',href='/public/dist/css/app.admin.min.725675dc.min.css')
+        link(rel='stylesheet',href='/public/css/amazeui.min.css')
+        link(rel='stylesheet',href='/public/css/amazeui.datatables.min.css')
+        link(rel='stylesheet',href='/public/js/plugins/editor/editor.css')
+        link(rel='stylesheet',href='/public/css/app.css')
+        script(src='/public/js/jquery.min.js')
+        script(src='/public/js/amazeui.min.js')
+        script(src='/public/js/jquery.twbsPagination.min.js')
+    block content
+    //-script(type='text/javascript',src='/public/dist/js/app.admin.min.04b688b5.min.js')
+    script(type='text/javascript',src='/public/js/amazeui.datatables.min.js')
+    script(type='text/javascript',src='/public/js/dataTables.responsive.min.js')
+    script(type='text/javascript',src='/public/js/app.js')
+    script(type='text/javascript',src='/public/js/theme.js')
+    //-!{Loader('/public/dist/js/app.admin.min.js').js('/public/js/amazeui.datatables.min.js').js('/public/js/dataTables.responsive.min.js').js('/public/js/echarts.min.js').js('/public/js/app.js').js('/public/js/theme.js').done(assets,configs.site_static_host,configs.mini_assets)}

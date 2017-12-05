@@ -1,0 +1,36 @@
+//- Created by Arthur on 2017/1/11.
+.am-u-sm-12.am-u-md-4
+    .widget.am-cf
+        .widget-head.am-cf
+            .widget-title.am-fl 专用服务器负载
+            .widget-function.am-fr
+                a.am-icon-cog(href='javascript:;')
+        .widget-body.widget-body-md.am-fr
+            .am-progress-title
+                | CPU
+                span#cpuSpan.am-fr.am-progress-title-more 0% / 100%
+            .am-progress
+                #cpu.am-progress-bar(style='width: 0%')
+            .am-progress-title
+                | 内存
+                span#memSpan.am-fr.am-progress-title-more 0% / 100%
+            .am-progress
+                #mem.am-progress-bar.am-progress-bar-warning(style='width: 0%')
+            .am-progress-title
+                | 磁盘
+                span.am-fr.am-progress-title-more 30% / 100%
+            .am-progress
+                .am-progress-bar.am-progress-bar-danger(style='width: 30%')
+
+            script.
+                $(function(){
+                    var timer=setInterval(function(){
+                        $.get('/admin/process',function(data){
+                            var cpu=$('#cpu'),mem=$('#mem'),cpuSpan=$('#cpuSpan'),memSpan=$('#memSpan');
+                            cpu.width(data.cpu+'%');
+                            cpuSpan.text(data.cpu+'% / 100%');
+                            mem.width(data.mem+'%');
+                            memSpan.text(data.mem+'% / 100%');
+                        })
+                    },2000);
+                })

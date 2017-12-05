@@ -1,0 +1,39 @@
+//- Created by Arthur on 2017/1/5.
+extends ../layout
+
+block content
+    body.page-index
+        #container.container
+            include includes/_header
+            .row.bottom
+                .col-lg-8.col-md-8.col-sm-7.col-left
+                    div
+                        section
+                            .row.text-center
+                                .col-lg-12
+                                    // 首页图片
+                                    img.img-responsive(src='/public/img/home.jpg', alt='Project header')
+                                    // 简介
+                                    h1 hello , 我是 #{hoster && hoster.username} !
+                                    h1.spacer ___
+                                    p.work 上海，浦东新区
+                                    p Web工程师，90后白羊男，热爱新技术，以Coding为生，以Coding为乐，爱学习，爱分享，爱足球，喜做饭...
+                .col-lg-4.col-md-4.col-sm-5.col-right
+                    #scroll-shadow
+                    h1.visible-xs.section-header Last work
+                    h1.visible-xs.text-center.spacer ___
+                    // work choice
+                    .item-choice
+                        a.filter(href='#', data-filter='all') 全部
+                        a.filter(href='#', data-filter='front')  前端
+                        a.filter(href='#', data-filter='design') 设计
+                        a.filter(href='#', data-filter='background')  后端
+                        a.filter(href='#', data-filter='mobile') 移动
+                        hr
+                    section#Grid.row
+                        - var map={'front':'前端','design':'设计','background':'后台','mobile':'移动'}
+                        include includes/project
+                        each item in projects || []
+                            +project(hoster,item,map)
+                    a.btn.btn-block.scroll-top.visible-xs
+                        img(src='/public/img/icon/icon-chevron.png', alt='回到顶部')

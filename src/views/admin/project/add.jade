@@ -1,0 +1,237 @@
+//- Created by Arthur on 2017/1/11.
+extends ../layout
+
+block content
+    body(data-type='widgets')
+        .am-g.tpl-g
+            // 头部
+            include ../includes/header
+            // 风格切换
+            include ../includes/theme
+            // 侧边导航栏
+            include ../includes/menu
+            //内容
+            .tpl-content-wrapper
+                .row-content.am-cf
+                    .row
+                        .am-u-sm-12.am-u-md-12.am-u-lg-12
+                            .widget.am-cf
+                                .widget-head.am-cf
+                                    .widget-title.am-fl #{ title || '新增项目'}
+                                    .widget-function.am-fr
+                                        a.am-icon-cog(href='javascript:;')
+                                .widget-body.am-fr
+                                    form#addProject(action='/admin/project/add' , method='post').am-form.tpl-form-line-form
+                                        -if (typeof(error) !== 'undefined' && error)
+                                            .am-alert.am-alert-danger
+                                                strong #{error}
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='title')
+                                                | 标题
+                                                span.tpl-form-line-small-title Title
+                                            .am-u-sm-10
+                                                input#title.tpl-form-input(type='text',name='project[title]', placeholder='请输入标题文字')
+                                                small 请填写标题文字5-30字之间。
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='github')
+                                                | Github地址
+                                                span.tpl-form-line-small-title Github
+                                            .am-u-sm-10
+                                                input#github.tpl-form-input(type='text',name='project[github]', placeholder='请输入github地址')
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='has_done') 项目已完成
+                                            .am-u-sm-10
+                                                .tpl-switch
+                                                    input#has_done.ios-switch.bigswitch.tpl-switch-btn(name='project[has_done]' ,type='checkbox')
+                                                    .tpl-switch-btn-view
+                                                        div
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='author')
+                                                | 作者
+                                                span.tpl-form-line-small-title Author
+                                            .am-u-sm-10
+                                                input#author.tpl-form-input(type='text', value='#{user.username}', readonly='readonly', disabled='disabled')
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label
+                                                | SEO关键字
+                                                span.tpl-form-line-small-title SEO
+                                            .am-u-sm-10
+                                                input#seo(name='project[seo]' ,type='text', placeholder='输入SEO关键字,多个关键字请用 英文逗号 隔开，例如：java,spring,spring mvc')
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='uploader')
+                                                | 封面图
+                                                span.tpl-form-line-small-title Images
+                                            #uploader.am-u-sm-10
+                                                .am-form-group.am-form-file
+                                                    #thelist.tpl-form-file-img.uploader-list
+                                                        img
+                                                    #picker.am-btn.am-btn-danger.am-btn-xs(type='button')
+                                                        i.am-icon-cloud-upload
+                                                        |  添加封面图片
+                                                    input#preview(type='hidden',name='project[preview]')
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label
+                                                | 标签
+                                                span.tpl-form-line-small-title Tags
+                                            .am-u-sm-10
+                                                label.am-form-label.am-u-sm-1
+                                                    input.tag(type='checkbox',name='project[tags]',value='front')
+                                                    | &nbsp;前端
+                                                label.am-form-label.am-u-sm-1
+                                                    input.tag(type='checkbox',name='project[tags]',value='design')
+                                                    | &nbsp;设计
+                                                label.am-form-label.am-u-sm-1
+                                                    input.tag(type='checkbox',name='project[tags]',value='background')
+                                                    | &nbsp;后端
+                                                label.am-form-label.am-u-sm-1
+                                                    input.tag(type='checkbox',name='project[tags]',value='mobile')
+                                                    | &nbsp;移动
+                                                div
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='isPublic') 隐藏项目
+                                            .am-u-sm-10
+                                                .tpl-switch
+                                                    input#isPublic.ios-switch.bigswitch.tpl-switch-btn(name='project[is_public]' ,type='checkbox', checked='checked')
+                                                    .tpl-switch-btn-view
+                                                        div
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='summary') 项目简介
+                                            .am-u-sm-10
+                                                textarea#summary(rows='5',name='project[summary]' placeholder='请输入项目简介',style='resize:none')
+                                                small 请填写标题文字10-200字之间。
+                                        .am-form-group
+                                            label.am-u-sm-2.am-form-label(for='editor') 内容
+                                            .am-u-sm-10
+                                                textarea#editor.editor(name='project[content]' ,rows='5')
+                                        .am-form-group
+                                            .am-u-sm-10.am-u-sm-push-2
+                                                button.am-btn.am-btn-primary.tpl-btn-bg-color-success(type='submit',style='margin-right:5px') 提交
+                                                a.am-btn.am-btn-warning(href='#') 取消
+            include ../includes/editor
+            script.
+                (function (WebUploader) {
+                    var editor = new Editor();
+                    editor.render($('.editor')[0]);
+                    var that = this;
+                    this.uploader = WebUploader.create({
+                        swf: '/public/js/plugins/webuploader/Uploader.swf',
+                        server: '/upload/upload',
+                        pick: $('#picker'),
+                        auto: true,
+                        fileSingleSizeLimit: 2 * 1024 * 1024,
+                    });
+                    // 当有文件被添加进队列的时候
+                    this.uploader.on('fileQueued', function (file) {
+                        var $container = $("#thelist");
+                        var $item = $('<div id="' + file.id + '" class="item">' +
+                                        '<img width="200" height="150">' +
+                                        '<p class="state">等待上传...</p>' +
+                                        '</div>'),
+                                $img = $item.find('img');
+                        $container.html($item);
+                    });
+                    // 文件上传过程中创建进度条实时显示。
+                    this.uploader.on('uploadProgress', function (file, percentage) {
+                        var $li = $('#' + file.id),
+                                $percent = $li.find('.progress .progress-bar');
+                        // 避免重复创建
+                        if (!$percent.length) {
+                            var progress = '<div class="progress progress-striped active">' +
+                                    '<div class="progress progress-bar" role="progressbar" style="width: 0%">' +
+                                    '</div>' +
+                                    '</div>';
+
+                            $percent = $(progress).prependTo($li).find('.progress-bar');
+                        }
+                        $li.find('p.state').text('上传中');
+                        $percent.css('width', percentage * 100 + '%');
+                    });
+                    this.uploader.on('uploadSuccess', function (file, res) {
+                        if (res.success) {
+                            $('#' + file.id).find('p.state').text('');
+                            $('#' + file.id).find('img').attr('src', res.url);
+                            $('#preview').val(res.url);
+                        }
+                        else {
+                            $('#' + file.id).find('p.state').text( '上传错误!');
+                        }
+                    });
+                    this.uploader.on('uploadError', function (file) {
+                        $('#' + file.id).find('p.state').text('上传错误!');
+                    });
+                    this.uploader.on('uploadComplete', function (file) {
+                        $('#' + file.id).find('.progress').fadeOut();
+                    });
+                    this.uploader.on('error', function (type) {
+                        self.removeFile();
+                        switch (type) {
+                            case 'Q_EXCEED_SIZE_LIMIT':
+                            case 'F_EXCEED_SIZE':
+                                alert('文件太大了, 不能超过2M');
+                                break;
+                            case 'Q_TYPE_DENIED':
+                                alert('只能上传图片');
+                                break;
+                            default:
+                                alert('发生未知错误');
+                        }
+                    });
+                })(window.WebUploader);
+
+                $(function () {
+                    function showTips(txt, time, status) {
+                        var htmlCon = '';
+                        if (txt != '') {
+                            if (status != 0 && status != undefined) {
+                                htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#4AAF33;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/ok.png" style="vertical-align: middle;margin-right:5px;" alt="OK，"/>' + txt + '</div>';
+                            } else {
+                                htmlCon = '<div class="tipsBox" style="width:220px;padding:10px;background-color:#D84C31;border-radius:4px;-webkit-border-radius: 4px;-moz-border-radius: 4px;color:#fff;box-shadow:0 0 3px #ddd inset;-webkit-box-shadow: 0 0 3px #ddd inset;text-align:center;position:fixed;top:25%;left:50%;z-index:999999;margin-left:-120px;"><img src="/public/img/icon/err.png" style="vertical-align: middle;margin-right:5px;" alt="Error，"/>' + txt + '</div>';
+                            }
+                            $('body').prepend(htmlCon);
+                            if (time == '' || time == undefined) {
+                                time = 1500;
+                            }
+                            setTimeout(function () {
+                                $('.tipsBox').remove();
+                            }, time);
+                        }
+                    }
+
+                    $('#addProject').submit(function () {
+                        var title = $('#title').val();
+                        var seo = $('#seo').val();
+                        var github = $('#github').val();
+                        var preview = $('#preview').val();
+                        var tags = $('.tag:checked');
+                        var summary = $('#summary').val();
+                        var content = $('#editor').val();
+
+                        if (title === '') {
+                            showTips('请填写标题~');
+                            return false;
+                        } else if (title.length < 5 || title.length > 50) {
+                            showTips('标题长度必需在5-50位之间~');
+                            return false;
+                        } else if (seo === '') {
+                            showTips('请填写seo关键字~');
+                            return false;
+                        } else if (preview === '') {
+                            showTips('请选择一张项目的封面图~');
+                            return false;
+                        } else if (tags.length <1 || tags.length >3) {
+                            showTips('项目的标签个数必需在1-3个之间');
+                            return false;
+                        } else if (summary === '') {
+                            showTips('请填写博客的简介~');
+                            return false;
+                        } else if (summary.length < 10 || summary.length > 200) {
+                            showTips('博客简介的字数必需在10-200之间~');
+                            return false;
+                        } else if (content === '') {
+                            showTips('博客的内容不能为空~');
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    })
+                })

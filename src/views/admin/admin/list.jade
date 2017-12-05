@@ -1,0 +1,123 @@
+//- Created by Arthur on 2017/1/10.
+extends ../layout
+
+block content
+    body(data-type='widgets')
+        .am-g.tpl-g
+            // 头部
+            include ../includes/header
+            // 风格切换
+            include ../includes/theme
+            // 侧边导航栏
+            include ../includes/menu
+            // 内容区域
+            .tpl-content-wrapper
+                .row-content.am-cf
+                    .row
+                        .am-u-sm-12.am-u-md-12.am-u-lg-12
+                            .widget.am-cf
+                                .widget-head.am-cf
+                                    .widget-title.am-cf #{title || '管理员列表'}
+                                .widget-body.am-fr
+                                    .am-u-sm-12.am-u-md-6.am-u-lg-6
+                                        .am-form-group
+                                            -if (user.role >= 100)
+                                                .am-btn-toolbar
+                                                    .am-btn-group.am-btn-group-xs
+                                                        a(href='/admin/admin/add').am-btn.am-btn-default.am-btn-success
+                                                            span.am-icon-plus
+                                                            | &nbsp;新增
+                                                        //-button.am-btn.am-btn-default.am-btn-secondary(type='button')
+                                                            span.am-icon-mail-forward
+                                                            | &nbsp;激活邮件
+                                                        //-button.am-btn.am-btn-default.am-btn-warning(type='button')
+                                                            span.am-icon-archive
+                                                            | &nbsp;重置密码
+                                                        //-button.am-btn.am-btn-default.am-btn-danger(type='button')
+                                                            span.am-icon-trash-o
+                                                            | &nbsp;删除
+                                    form#search(action='/admin/admin/list',method='get')
+                                        .am-u-sm-12.am-u-md-6.am-u-lg-3
+                                            .am-form-group.tpl-table-list-select
+                                                select(name='query[adminType]',data-am-selected="{btnSize: 'sm'}")
+                                                    option(value='all') 所有类别
+                                                    option(value=0) 管理员
+                                                    option(value=1) 超级管理员
+                                        .am-u-sm-12.am-u-md-12.am-u-lg-3
+                                            .am-input-group.am-input-group-sm.tpl-form-border-form.cl-p
+                                                input.am-form-field(name='query[keyword]',type='text')
+                                                span.am-input-group-btn
+                                                    button.am-btn.am-btn-default.am-btn-success.tpl-table-list-field.am-icon-search(type='submit')
+                                    .am-u-sm-12
+                                        table#example-r.am-table.am-table-compact.am-table-striped.tpl-table-black(width='100%')
+                                            thead
+                                                tr
+                                                    th 选择
+                                                    th 用户名
+                                                    th 状态
+                                                    th 邮箱
+                                                    th 性别
+                                                    th 创建时间
+                                                    th 最近修改时间
+                                                    -if (user.role >= 100)
+                                                        th 操作
+                                            tbody
+                                                each item in users
+                                                    tr.gradeX
+                                                        td: input(id='#{item._id}',type='checkbox',name='checks')
+                                                        td #{item.username}
+                                                        td: case item.status
+                                                                when '已激活'
+                                                                    span.am-badge.am-badge-success #{item.status}
+                                                                when '已注销'
+                                                                    span.am-badge.am-badge-danger #{item.status}
+                                                                when '待激活'
+                                                                    span.am-badge.am-badge-warning #{item.status}
+                                                                when '正常'
+                                                                    span.am-badge.am-badge-success #{item.status}
+                                                        td #{item.email}
+                                                        td #{item.sex}
+                                                        td #{moment(item.meta.createAt).format('YYYY年MM月DD日')}
+                                                        td #{moment(item.meta.lastModified).format('YYYY年MM月DD日')}
+                                                        -if (user.role >= 100)
+                                                            td
+                                                                div
+                                                                    - if (!item.active)
+                                                                        a(style='margin-right:3px',href='/admin/user/resendActive/#{item._id}').am-btn.am-btn-xs.am-btn-secondary
+                                                                            i.am-icon-mail-forward
+                                                                            | &nbsp;激活邮件
+                                                                    - else
+                                                                        a(disabled,style='margin-right:3px').am-btn.am-btn-xs.am-btn-secondary.disabled
+                                                                            i.am-icon-mail-forward
+                                                                            | &nbsp;激活邮件
+                                                                    a(style='margin-right:3px',href='/admin/user/resetPass/#{item._id}',target='_self').am-btn.am-btn-xs.am-btn-warning
+                                                                        i.am-icon-anchor
+                                                                        | &nbsp;重置密码
+                                                                    a(style='margin-right:3px',href='/admin/user/edit/#{item._id}',target='_self').am-btn.am-btn-xs.am-btn-primary
+                                                                        i.am-icon-pencil
+                                                                        | &nbsp;编辑
+                                                                    aa(href='/admin/user/delete/#{item._id}',target='_self').am-btn.am-btn-xs.am-btn-danger
+                                                                        i.am-icon-trash
+                                                                        | &nbsp;删除
+                                    // 分页
+                                    .am-u-lg-12.am-cf
+                                        .am-fr
+                                            ul.am-pagination.tpl-pagination
+            script.
+                $(document).ready(function () {
+                    $('.tpl-pagination').twbsPagination({
+                        totalPages: #{pageCount || 0},
+                        visiblePages: 5,
+                        activeClass:'am-active',
+                        paginationClass:'am-pagination',
+                        disabledClass:'am-disabled',
+                        first: '首页',
+                        last: '末页',
+                        prev: '&laquo;',
+                        next: '&raquo;',
+                        href: '/admin/admin/list?page={{number}}',
+                        onPageClick: function (e, page) {
+                            console.log(page);
+                        }
+                    });
+                });

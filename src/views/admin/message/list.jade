@@ -1,0 +1,114 @@
+//- Created by Arthur on 2017/1/11.
+extends ../layout
+
+block content
+    body(data-type='widgets')
+        .am-g.tpl-g
+            // 头部
+            include ../includes/header
+            // 风格切换
+            include ../includes/theme
+            // 侧边导航栏
+            include ../includes/menu
+            //内容
+            .tpl-content-wrapper
+                .row-content.am-cf
+                    .row
+                        .am-u-sm-12.am-u-md-12.am-u-lg-12
+                            .widget.am-cf
+                                .widget-head.am-cf
+                                    .widget-title.am-cf #{title || '消息列表'}
+                                .widget-body.am-fr
+                                    .am-u-sm-12.am-u-md-6.am-u-lg-3
+                                        .am-form-group
+                                            .am-btn-toolbar
+                                                .am-btn-group.am-btn-group-xs
+                                                    button.am-btn.am-btn-default.am-btn-success(type='button')
+                                                        span.am-icon-eye-slash
+                                                        |  标为已读
+                                                    button.am-btn.am-btn-default.am-btn-danger(type='button')
+                                                        span.am-icon-trash-o
+                                                        |  删除
+                                    .am-u-sm-12.am-u-md-6.am-u-lg-3
+                                        .am-form-group.tpl-table-list-select
+                                            select(data-am-selected="{btnSize: 'sm'}")
+                                                option(value='option1') 所有类别
+                                                option(value='option2') 已读
+                                                option(value='option3') 未读
+                                    .am-u-sm-12.am-u-md-6.am-u-lg-3
+                                        .am-form-group.tpl-table-list-select
+                                            select(data-am-selected="{btnSize: 'sm'}")
+                                                option(value='option1') 所有类别
+                                                option(value='option2') 系统消息
+                                                option(value='option3') 邮件通知
+                                                option(value='option4') 回复
+                                                option(value='option4') 评论
+                                    .am-u-sm-12.am-u-md-12.am-u-lg-3
+                                        .am-input-group.am-input-group-sm.tpl-form-border-form.cl-p
+                                            input.am-form-field(type='text')
+                                            span.am-input-group-btn
+                                                button.am-btn.am-btn-default.am-btn-success.tpl-table-list-field.am-icon-search(type='button')
+                                    .am-u-sm-12
+                                        ul.tpl-task-list
+                                            each item in messages || []
+                                                li
+                                                    .task-checkbox
+                                                        input(type='hidden', value='1', name='id')
+                                                        input.liChild(type='checkbox', value='2', name='test')
+                                                    .task-title
+                                                        -if (!item.has_read)
+                                                            span.label.label-sm.label-warning 未读
+                                                        -else
+                                                            span.label.label-sm.label-success 已读
+                                                        span &nbsp;&nbsp;
+                                                        case item.type
+                                                            when 'system'
+                                                                span.task-bell
+                                                                    i.am-icon-bell-o
+                                                            when 'mail'
+                                                                span.task-bell
+                                                                    i.am-icon-mail-forward
+                                                            when 'reply'
+                                                                span.task-bell
+                                                                    i.am-icon-reply
+                                                            when 'comment'
+                                                                span.task-bell
+                                                                    i.am-icon-comment-o
+                                                        include ../includes/msg_title
+                                                        +msgTitle(item)
+                                                    .task-config
+                                                        .am-dropdown.tpl-task-list-dropdown(data-am-dropdown='')
+                                                            a.am-dropdown-toggle.tpl-task-list-hover(href='###', data-am-dropdown-toggle='')
+                                                                i.am-icon-cog
+                                                                | &nbsp;
+                                                                span.am-icon-caret-down
+                                                            ul.am-dropdown-content.tpl-task-list-dropdown-ul
+                                                                li
+                                                                    a(href='/admin/message/read/#{item._id}')
+                                                                        i.am-icon-check
+                                                                        |  已读
+                                                                li
+                                                                    a(href='/admin/message/remove/#{item._id}')
+                                                                        i.am-icon-pencil
+                                                                        |  删除
+                                    .am-u-lg-12.am-cf
+                                        .am-fr
+                                            ul.am-pagination.tpl-pagination
+        script.
+            $(document).ready(function () {
+                $('.tpl-pagination').twbsPagination({
+                    totalPages: #{pageCount || 0},
+                    visiblePages: 5,
+                    activeClass: 'am-active',
+                    paginationClass: 'am-pagination',
+                    disabledClass: 'am-disabled',
+                    first: '首页',
+                    last: '末页',
+                    prev: '&laquo;',
+                    next: '&raquo;',
+                    href: '/admin/message/mine/list?page={{number}}',
+                    onPageClick: function (e, page) {
+                        console.log(page);
+                    }
+                });
+            });

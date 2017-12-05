@@ -1,0 +1,28 @@
+//- Created by Arthur on 2017/1/11.
+extends layout
+
+block content
+    body(data-type='index')
+        // 头部
+        include ./includes/header
+        // 风格切换
+        include ./includes/theme
+        // 侧边导航栏
+        include ./includes/menu
+        // 内容
+        .tpl-content-wrapper
+            .row-content.am-cf
+                .row.am-cf
+                    // 用户，项目，博客统计
+                    include ./includes/statistics
+                .row.am-cf
+                    //新增用户
+                    //-include ./includes/vistors_new
+                    include ./includes/my_projects
+                    //项目实时内存，cpu监控
+                    include ./includes/process
+                .row.am-cf
+                    //用户资料
+                    include ./includes/mine_profile
+                    //我的博客
+                    include ./includes/my_blogs

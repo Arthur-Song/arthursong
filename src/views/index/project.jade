@@ -1,0 +1,60 @@
+//- Created by Arthur on 2017/1/5.
+extends ../layout
+
+block content
+    body.page-project-example
+        #container.container
+            include includes/_header
+            .row.bottom
+                -if (project)
+                    .col-lg-8.col-md-8.col-sm-7.col-left
+                        div
+                            section
+                                img.img-responsive(src='#{project.preview}', alt='#{project.title}')
+                                h1 #{project.title}
+                                h1.spacer ___
+                                p.item-tags
+                                    each tag in project.tags || []
+                                        a(href='#') #{tag}
+                                        |  ,
+                                p.item-description
+                                    strong #{project.summary}
+                                div#content !{project.content}
+                                // 分页
+                                include includes/pager
+                                +pager(hoster,page,'project')
+                                hr
+                                // 分享
+                                .row
+                                    .col-lg-4.col-md-4.col-sm-4.col-xs-4
+                                        h3.share 分享
+                                    .col-lg-8.col-md-8.col-sm-8.col-xs-8.text-right
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/wechat.png', alt='微信')
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/sina.png', alt='新浪')
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/facebook.png', alt='Facebook')
+                                        a(href='#')
+                                            img.social(src='/public/img/icon/qq.png', alt='QQ')
+                -else
+                    .col-lg-8.col-md-8.col-sm-7.col-left
+                .col-lg-4.col-md-4.col-sm-5.col-right
+                    #scroll-shadow
+                    h1.visible-xs.section-header Last work
+                    h1.visible-xs.text-center.spacer ___
+                    // work choice
+                    .item-choice
+                        a.filter(href='#', data-filter='all') 全部
+                        a.filter(href='#', data-filter='front')  前端
+                        a.filter(href='#', data-filter='design')  设计
+                        a.filter(href='#', data-filter='background')  后端
+                        a.filter(href='#', data-filter='mobile') 移动端
+                        hr
+                    section#Grid.row
+                        - var map={'front':'前端','design':'设计','background':'后台','mobile':'移动'}
+                        include includes/project
+                        each item in projects || []
+                            +project(hoster,item,map)
+                    a.btn.btn-block.scroll-top.visible-xs
+                        img(src='/public/img/icon/icon-chevron.png', alt='回到顶部')
