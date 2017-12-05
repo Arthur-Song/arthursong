@@ -11,14 +11,15 @@ arthursong 是使用 **Node.js** 和 **MongoDB** 开发的博客系统，界面�
 开发使用的是 [Node.js](https://nodejs.org) v4.4.0，[MongoDB](https://www.mongodb.org) 是 v3.x，[Redis](http://redis.io) 是 v3.x。
 
 ```
-1. 安装 `Node.js[必须]` `MongoDB[必须]` `Redis[可选]`
+1. 安装 `Node.js[必须]` `MongoDB[必须]` `Redis[可选]` `pm2[可选]`
 2. 启动 MongoDB 和 Redis
 3. `$ make install` 安装 arthursong 的依赖包
 4. `cp config.default.js config.js` 请根据需要修改配置文件
-5. `$ npm run start` 调试模式启动项目
-6. `$ npm run start:prod` 使用pm2启动项目
-7. visit `http://localhost:3000`
-8. done!
+5. `cd src/` 进入src目录，修改init.js文件，运行`$ node init.js` 初始化超级管理员，默认密码为：520arthursong
+6. `$ npm run start` 调试模式启动项目
+7. `$ npm run start:prod` 使用pm2多节点集群方式启动项目
+8. visit `http://localhost:3000`
+9. done!
 ```
 
 ## 贡献
